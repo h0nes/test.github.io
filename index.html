@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   >
-  <title>XIAO BLE Keypad</title>
+  <title>BLE MACRO</title>
 
   <style>
     :root{
@@ -116,7 +116,7 @@
       font-weight:800;
       padding:0 12px;
       box-shadow:var(--shadow);
-      touch-action:manipulation;
+      touch-action:none;
     }
 
     .connect{ background:var(--blue); }
@@ -178,7 +178,7 @@
       font-size:28px;
       font-weight:800;
       box-shadow:var(--shadow);
-      touch-action:manipulation;
+      touch-action:none;
       min-height:0;
     }
 
@@ -284,8 +284,8 @@
 
       <div class="topbar">
         <div id="status" class="status">未接続</div>
-        <button class="mini-btn connect" onclick="connectBLE()">接続</button>
-        <button class="mini-btn disconnect" onclick="disconnectBLE()">切断</button>
+        <button class="mini-btn connect app-btn" data-action="connect">接続</button>
+        <button class="mini-btn disconnect app-btn" data-action="disconnect">切断</button>
       </div>
 
       <div class="display-wrap">
@@ -298,24 +298,24 @@
       <div class="pad-title">テンキー</div>
 
       <div class="pad-grid">
-        <button class="key" onclick="appendInput('7')">7</button>
-        <button class="key" onclick="appendInput('8')">8</button>
-        <button class="key" onclick="appendInput('9')">9</button>
-        <button class="key macro" onclick="sendMacro('MACRO_A')">A</button>
+        <button class="key app-btn" data-action="append" data-value="7">7</button>
+        <button class="key app-btn" data-action="append" data-value="8">8</button>
+        <button class="key app-btn" data-action="append" data-value="9">9</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_A">A</button>
 
-        <button class="key" onclick="appendInput('4')">4</button>
-        <button class="key" onclick="appendInput('5')">5</button>
-        <button class="key" onclick="appendInput('6')">6</button>
-        <button class="key macro" onclick="sendMacro('MACRO_B')">B</button>
+        <button class="key app-btn" data-action="append" data-value="4">4</button>
+        <button class="key app-btn" data-action="append" data-value="5">5</button>
+        <button class="key app-btn" data-action="append" data-value="6">6</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_B">B</button>
 
-        <button class="key" onclick="appendInput('1')">1</button>
-        <button class="key" onclick="appendInput('2')">2</button>
-        <button class="key" onclick="appendInput('3')">3</button>
-        <button class="key macro" onclick="sendMacro('MACRO_C')">C</button>
+        <button class="key app-btn" data-action="append" data-value="1">1</button>
+        <button class="key app-btn" data-action="append" data-value="2">2</button>
+        <button class="key app-btn" data-action="append" data-value="3">3</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_C">C</button>
 
-        <button class="key fn" onclick="backspaceInput()">BS</button>
-        <button class="key zero" onclick="appendInput('0')">0</button>
-        <button class="key enter" onclick="sendCurrentInput()">Ent</button>
+        <button class="key fn app-btn" data-action="backspace">BS</button>
+        <button class="key zero app-btn" data-action="append" data-value="0">0</button>
+        <button class="key enter app-btn" data-action="send">Ent</button>
       </div>
     </div>
   </div>
@@ -330,6 +330,7 @@
     let rxChar = null;
     let inputBuffer = "";
     let lastTouchEnd = 0;
+    const handledTouches = new WeakSet();
 
     const statusEl = document.getElementById("status");
     const displayEl = document.getElementById("display");
@@ -435,6 +436,59 @@
       await sendText(name + "\n");
     }
 
+    function runAction(button){
+      const action = button.dataset.action;
+      const value = button.dataset.value || "";
+
+      switch(action){
+        case "connect":
+          connectBLE();
+          break;
+        case "disconnect":
+          disconnectBLE();
+          break;
+        case "append":
+          appendInput(value);
+          break;
+        case "backspace":
+          backspaceInput();
+          break;
+        case "send":
+          sendCurrentInput();
+          break;
+        case "macro":
+          sendMacro(value);
+          break;
+      }
+    }
+
+    function handlePress(event){
+      const button = event.currentTarget;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (event.type === "touchstart") {
+        handledTouches.add(button);
+      }
+
+      if (event.type === "click" && handledTouches.has(button)) {
+        handledTouches.delete(button);
+        return;
+      }
+
+      runAction(button);
+    }
+
+    document.querySelectorAll(".app-btn").forEach((button) => {
+      button.addEventListener("touchstart", handlePress, { passive:false });
+      button.addEventListener("click", handlePress, { passive:false });
+      button.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, { passive:false });
+    });
+
     document.addEventListener("touchmove", function(event){
       event.preventDefault();
     }, { passive:false });
@@ -457,7 +511,7 @@
 
     document.addEventListener("touchend", function(event){
       const now = Date.now();
-      if(now - lastTouchEnd <= 300){
+      if(now - lastTouchEnd <= 350){
         event.preventDefault();
       }
       lastTouchEnd = now;
