@@ -19,8 +19,8 @@
       --blue:#56a8ff;
       --red:#ff6677;
       --green:#49e09b;
-      --macro:#5d6f89;
-      --fn:#566781;
+      --macro:#6b7c99;
+      --fn:#5f708c;
       --display:#050912;
       --border:#334157;
       --shadow:0 10px 28px rgba(0,0,0,.35);
@@ -74,11 +74,11 @@
     }
 
     .title{
-      font-size:clamp(18px, 4.5vw, 28px);
-      font-weight:800;
+      font-size:clamp(16px, 4vw, 24px);
+      font-weight:900;
       margin-bottom:8px;
-      line-height:1.15;
-      letter-spacing:.02em;
+      line-height:1.1;
+      letter-spacing:.01em;
     }
 
     .topbar{
@@ -89,7 +89,7 @@
     }
 
     .status{
-      min-height:38px;
+      min-height:36px;
       background:var(--panel2);
       border-radius:14px;
       border:1px solid rgba(255,255,255,.04);
@@ -100,17 +100,17 @@
       overflow:hidden;
       white-space:nowrap;
       text-overflow:ellipsis;
-      font-size:13px;
+      font-size:12px;
     }
 
     .mini-btn{
-      height:38px;
-      min-width:68px;
+      height:36px;
+      min-width:66px;
       border:none;
       border-radius:14px;
       color:#fff;
-      font-size:15px;
-      font-weight:800;
+      font-size:14px;
+      font-weight:900;
       padding:0 10px;
       box-shadow:var(--shadow);
       touch-action:none;
@@ -146,38 +146,49 @@
     .key{
       background:var(--key);
       color:#fff;
-      font-size:24px;
-      font-weight:800;
+      font-size:30px;
+      font-weight:900;
       touch-action:none;
       display:flex;
       align-items:center;
       justify-content:center;
       text-align:center;
       line-height:1;
-      padding:4px;
+      padding:2px;
       overflow:hidden;
+    }
+
+    .num{
+      font-size:clamp(30px, 8vw, 44px);
+      font-weight:900;
     }
 
     .macro{
       background:var(--macro);
-      font-size:clamp(24px, 4.5vw, 36px);
       font-weight:900;
-      letter-spacing:0;
+      letter-spacing:-0.04em;
     }
 
-    .macro.long{
-      font-size:clamp(20px, 4vw, 30px);
+    .macro.jp2{
+      font-size:clamp(30px, 8vw, 42px);
+    }
+
+    .macro.en3{
+      font-size:clamp(26px, 7vw, 36px);
+      letter-spacing:-0.05em;
     }
 
     .fn{
       background:var(--fn);
-      font-size:22px;
+      font-size:clamp(28px, 7vw, 38px);
+      font-weight:900;
     }
 
     .enter{
       background:var(--green);
       color:#072317;
-      font-size:24px;
+      font-size:clamp(28px, 7vw, 38px);
+      font-weight:900;
     }
 
     .display-cell{
@@ -187,12 +198,13 @@
       align-items:center;
       justify-content:center;
       text-align:center;
-      font-size:34px;
-      font-weight:800;
-      letter-spacing:.12em;
+      font-size:clamp(34px, 9vw, 50px);
+      font-weight:900;
+      letter-spacing:.08em;
       font-variant-numeric:tabular-nums;
       color:#fff;
       grid-column:2 / span 2;
+      padding-left:.08em;
     }
 
     .zero-wide{
@@ -209,28 +221,40 @@
         gap:8px;
       }
 
-      .key{
-        font-size:22px;
+      .title{
+        font-size:clamp(15px, 3.8vw, 20px);
       }
 
-      .macro{
-        font-size:clamp(20px, 5vw, 30px);
+      .status{
+        font-size:11px;
       }
 
-      .macro.long{
-        font-size:clamp(17px, 4.2vw, 24px);
+      .mini-btn{
+        font-size:13px;
+      }
+
+      .num{
+        font-size:clamp(28px, 8.5vw, 40px);
+      }
+
+      .macro.jp2{
+        font-size:clamp(28px, 8vw, 38px);
+      }
+
+      .macro.en3{
+        font-size:clamp(24px, 6.6vw, 32px);
       }
 
       .fn{
-        font-size:19px;
+        font-size:clamp(24px, 6.8vw, 34px);
       }
 
       .enter{
-        font-size:20px;
+        font-size:clamp(24px, 6.8vw, 34px);
       }
 
       .display-cell{
-        font-size:30px;
+        font-size:clamp(30px, 8.5vw, 44px);
       }
     }
   </style>
@@ -249,31 +273,31 @@
 
     <div class="card pad-card">
       <div class="pad-grid">
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_A">空席</button>
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_B">禁煙</button>
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_C">喫煙</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_D">ESC</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_A">空席</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_B">禁煙</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_C">喫煙</button>
+        <button class="key macro en3 app-btn" data-action="macro" data-value="MACRO_D">ESC</button>
 
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_E">切替</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_E">切替</button>
         <div id="display" class="display-cell">000</div>
         <button class="key fn app-btn" data-action="backspace">BS</button>
 
-        <button class="key app-btn" data-action="append" data-value="7">7</button>
-        <button class="key app-btn" data-action="append" data-value="8">8</button>
-        <button class="key app-btn" data-action="append" data-value="9">9</button>
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_F">退店</button>
+        <button class="key num app-btn" data-action="append" data-value="7">7</button>
+        <button class="key num app-btn" data-action="append" data-value="8">8</button>
+        <button class="key num app-btn" data-action="append" data-value="9">9</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_F">退店</button>
 
-        <button class="key app-btn" data-action="append" data-value="4">4</button>
-        <button class="key app-btn" data-action="append" data-value="5">5</button>
-        <button class="key app-btn" data-action="append" data-value="6">6</button>
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_G">外出</button>
+        <button class="key num app-btn" data-action="append" data-value="4">4</button>
+        <button class="key num app-btn" data-action="append" data-value="5">5</button>
+        <button class="key num app-btn" data-action="append" data-value="6">6</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_G">外出</button>
 
-        <button class="key app-btn" data-action="append" data-value="1">1</button>
-        <button class="key app-btn" data-action="append" data-value="2">2</button>
-        <button class="key app-btn" data-action="append" data-value="3">3</button>
-        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_H">入室</button>
+        <button class="key num app-btn" data-action="append" data-value="1">1</button>
+        <button class="key num app-btn" data-action="append" data-value="2">2</button>
+        <button class="key num app-btn" data-action="append" data-value="3">3</button>
+        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_H">入室</button>
 
-        <button class="key zero-wide app-btn" data-action="append" data-value="0">0</button>
+        <button class="key num zero-wide app-btn" data-action="append" data-value="0">0</button>
         <button class="key enter app-btn" data-action="send">ENT</button>
       </div>
     </div>
