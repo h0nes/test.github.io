@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   >
-  <title>XIAO BLE Keypad</title>
+  <title>XIAO BLE Macro Keypad</title>
 
   <style>
     :root{
@@ -21,10 +21,11 @@
       --green:#49e09b;
       --macro:#5d6f89;
       --fn:#566781;
+      --display:#050912;
       --border:#334157;
       --shadow:0 10px 28px rgba(0,0,0,.35);
       --radius:18px;
-      --gap:12px;
+      --gap:10px;
     }
 
     *{
@@ -49,17 +50,17 @@
     }
 
     body{
-      padding:10px;
+      padding:8px;
     }
 
     .app{
       width:100%;
       max-width:560px;
-      height:calc(100dvh - 20px);
+      height:calc(100dvh - 16px);
       margin:0 auto;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:8px;
       overflow:hidden;
     }
 
@@ -67,98 +68,56 @@
       background:var(--panel);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:12px;
+      padding:10px;
       overflow:hidden;
       flex:0 0 auto;
     }
 
-    .card.header-card{
-      padding-bottom:10px;
-    }
-
     .title{
-      font-size:clamp(20px, 4.8vw, 32px);
+      font-size:clamp(18px, 4.5vw, 28px);
       font-weight:800;
-      margin-bottom:10px;
-      letter-spacing:.02em;
+      margin-bottom:8px;
       line-height:1.15;
+      letter-spacing:.02em;
     }
 
     .topbar{
       display:grid;
       grid-template-columns:1fr auto auto;
-      gap:8px;
+      gap:6px;
       align-items:center;
     }
 
     .status{
-      min-height:40px;
+      min-height:38px;
       background:var(--panel2);
       border-radius:14px;
       border:1px solid rgba(255,255,255,.04);
       color:var(--sub);
       display:flex;
       align-items:center;
-      padding:0 12px;
+      padding:0 10px;
       overflow:hidden;
       white-space:nowrap;
       text-overflow:ellipsis;
-      font-size:14px;
+      font-size:13px;
     }
 
     .mini-btn{
-      height:40px;
-      min-width:74px;
+      height:38px;
+      min-width:68px;
       border:none;
       border-radius:14px;
       color:#fff;
-      font-size:16px;
+      font-size:15px;
       font-weight:800;
-      padding:0 12px;
+      padding:0 10px;
       box-shadow:var(--shadow);
       touch-action:none;
     }
 
     .connect{ background:var(--blue); }
     .disconnect{ background:var(--red); }
-
-    .display-wrap{
-      margin-top:10px;
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .display-label{
-      color:var(--sub);
-      font-size:13px;
-      margin-bottom:6px;
-    }
-
-    .display-box{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      flex:1;
-    }
-
-    .display{
-      width:150px;
-      min-height:62px;
-      border-radius:16px;
-      border:2px solid var(--border);
-      background:#050912;
-      padding:12px 14px;
-      font-size:34px;
-      font-weight:800;
-      letter-spacing:.12em;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      font-variant-numeric: tabular-nums;
-    }
 
     .pad-card{
       flex:1 1 auto;
@@ -167,53 +126,64 @@
       min-height:0;
     }
 
-    .pad-title{
-      font-size:18px;
-      font-weight:800;
-      margin-bottom:10px;
-      flex:0 0 auto;
-    }
-
     .pad-grid{
       flex:1 1 auto;
       min-height:0;
       display:grid;
       grid-template-columns:repeat(4, 1fr);
-      grid-template-rows:repeat(5, 1fr);
+      grid-template-rows:repeat(6, 1fr);
       gap:var(--gap);
     }
 
-    .key{
+    .key,
+    .display-cell{
       border:none;
-      border-radius:18px;
-      background:var(--key);
-      color:#fff;
-      font-size:28px;
-      font-weight:800;
-      box-shadow:var(--shadow);
-      touch-action:none;
+      border-radius:16px;
       min-height:0;
+      box-shadow:var(--shadow);
     }
 
-    .fn{
-      background:var(--fn);
-      font-size:20px;
+    .key{
+      background:var(--key);
+      color:#fff;
+      font-size:24px;
+      font-weight:800;
+      touch-action:none;
     }
 
     .macro{
       background:var(--macro);
-      font-size:24px;
+      font-size:21px;
+    }
+
+    .fn{
+      background:var(--fn);
+      font-size:19px;
     }
 
     .enter{
       background:var(--green);
       color:#072317;
-      font-size:22px;
+      font-size:20px;
     }
 
-    .empty{
-      visibility:hidden;
-      pointer-events:none;
+    .display-cell{
+      background:var(--display);
+      border:2px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      font-size:34px;
+      font-weight:800;
+      letter-spacing:.12em;
+      font-variant-numeric:tabular-nums;
+      color:#fff;
+      grid-column:2 / span 2;
+    }
+
+    .zero-wide{
+      grid-column:1 / span 3;
     }
 
     .key:active,
@@ -222,79 +192,35 @@
     }
 
     @media (max-width:430px){
-      body{
-        padding:8px;
-      }
-
-      .app{
-        height:calc(100dvh - 16px);
+      .pad-grid{
         gap:8px;
       }
 
-      .card{
-        padding:10px;
-      }
-
-      .title{
-        font-size:clamp(18px, 4.6vw, 28px);
-        margin-bottom:8px;
-      }
-
-      .topbar{
-        gap:6px;
-      }
-
-      .status{
-        min-height:38px;
-        font-size:13px;
-        padding:0 10px;
-      }
-
-      .mini-btn{
-        height:38px;
-        min-width:68px;
-        font-size:15px;
-        padding:0 10px;
-      }
-
-      .display{
-        width:132px;
-        min-height:56px;
-        font-size:30px;
-        padding:10px 12px;
-      }
-
-      .pad-title{
-        font-size:17px;
-        margin-bottom:8px;
-      }
-
-      .pad-grid{
-        gap:10px;
-      }
-
       .key{
-        font-size:24px;
-        border-radius:16px;
-      }
-
-      .fn{
-        font-size:18px;
-      }
-
-      .macro{
         font-size:22px;
       }
 
+      .macro{
+        font-size:19px;
+      }
+
+      .fn{
+        font-size:17px;
+      }
+
       .enter{
-        font-size:20px;
+        font-size:18px;
+      }
+
+      .display-cell{
+        font-size:30px;
       }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="card header-card">
+    <div class="card">
       <div class="title">XIAO BLE テンキー + マクロパッド</div>
 
       <div class="topbar">
@@ -302,43 +228,36 @@
         <button class="mini-btn connect app-btn" data-action="connect">接続</button>
         <button class="mini-btn disconnect app-btn" data-action="disconnect">切断</button>
       </div>
-
-      <div class="display-wrap">
-        <div class="display-box">
-          <div class="display-label">入力中</div>
-          <div id="display" class="display"></div>
-        </div>
-      </div>
     </div>
 
     <div class="card pad-card">
-      <div class="pad-title">テンキー</div>
-
       <div class="pad-grid">
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_A">A</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_B">B</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_C">C</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_D">D</button>
+
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_E">E</button>
+        <div id="display" class="display-cell">000</div>
+        <button class="key fn app-btn" data-action="backspace">BS</button>
+
         <button class="key app-btn" data-action="append" data-value="7">7</button>
         <button class="key app-btn" data-action="append" data-value="8">8</button>
         <button class="key app-btn" data-action="append" data-value="9">9</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_A">A</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_F">F</button>
 
         <button class="key app-btn" data-action="append" data-value="4">4</button>
         <button class="key app-btn" data-action="append" data-value="5">5</button>
         <button class="key app-btn" data-action="append" data-value="6">6</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_B">B</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_G">G</button>
 
         <button class="key app-btn" data-action="append" data-value="1">1</button>
         <button class="key app-btn" data-action="append" data-value="2">2</button>
         <button class="key app-btn" data-action="append" data-value="3">3</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_C">C</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_H">H</button>
 
-        <button class="key fn app-btn" data-action="backspace">BS</button>
-        <button class="key app-btn" data-action="append" data-value="0">0</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_D">D</button>
-        <button class="key enter app-btn" data-action="send">Ent</button>
-
-        <button class="key empty" tabindex="-1" aria-hidden="true"></button>
-        <button class="key empty" tabindex="-1" aria-hidden="true"></button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_E">E</button>
-        <button class="key empty" tabindex="-1" aria-hidden="true"></button>
+        <button class="key zero-wide app-btn" data-action="append" data-value="0">0</button>
+        <button class="key enter app-btn" data-action="send">ENT</button>
       </div>
     </div>
   </div>
@@ -364,7 +283,7 @@
     }
 
     function updateDisplay(){
-      displayEl.textContent = inputBuffer;
+      displayEl.textContent = inputBuffer.length ? inputBuffer.padStart(3, "0") : "000";
     }
 
     function appendInput(char){
@@ -476,6 +395,9 @@
           break;
         case "backspace":
           backspaceInput();
+          break;
+        case "clear":
+          clearInput();
           break;
         case "send":
           sendCurrentInput();
