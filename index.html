@@ -19,13 +19,21 @@
       --blue:#56a8ff;
       --red:#ff6677;
       --green:#49e09b;
-      --macro:#6b7c99;
-      --fn:#5f708c;
       --display:#050912;
       --border:#334157;
       --shadow:0 10px 28px rgba(0,0,0,.35);
       --radius:18px;
       --gap:10px;
+
+      --seat-vacant:#39c46a;
+      --seat-nosmoke:#3d8cff;
+      --seat-smoke:#9b59ff;
+      --seat-leave:#ff5a6e;
+      --seat-out:#ff9f43;
+      --seat-enter:#2ec9c3;
+
+      --macro-neutral:#6b7c99;
+      --fn:#5f708c;
     }
 
     *{
@@ -161,12 +169,14 @@
     .num{
       font-size:clamp(30px, 8vw, 44px);
       font-weight:900;
+      background:#2f3a4f;
     }
 
     .macro{
-      background:var(--macro);
       font-weight:900;
       letter-spacing:-0.04em;
+      color:#fff;
+      text-shadow:0 1px 2px rgba(0,0,0,.28);
     }
 
     .macro.jp2{
@@ -176,6 +186,34 @@
     .macro.en3{
       font-size:clamp(26px, 7vw, 36px);
       letter-spacing:-0.05em;
+    }
+
+    .macro-neutral{
+      background:var(--macro-neutral);
+    }
+
+    .macro-vacant{
+      background:var(--seat-vacant);
+    }
+
+    .macro-nosmoke{
+      background:var(--seat-nosmoke);
+    }
+
+    .macro-smoke{
+      background:var(--seat-smoke);
+    }
+
+    .macro-leave{
+      background:var(--seat-leave);
+    }
+
+    .macro-out{
+      background:var(--seat-out);
+    }
+
+    .macro-enter{
+      background:var(--seat-enter);
     }
 
     .fn{
@@ -214,6 +252,7 @@
     .key:active,
     .mini-btn:active{
       transform:scale(0.98);
+      filter:brightness(0.95);
     }
 
     @media (max-width:430px){
@@ -273,29 +312,29 @@
 
     <div class="card pad-card">
       <div class="pad-grid">
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_A">空席</button>
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_B">禁煙</button>
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_C">喫煙</button>
-        <button class="key macro en3 app-btn" data-action="macro" data-value="MACRO_D">ESC</button>
+        <button class="key macro jp2 macro-vacant app-btn" data-action="macro" data-value="MACRO_A">空席</button>
+        <button class="key macro jp2 macro-nosmoke app-btn" data-action="macro" data-value="MACRO_B">禁煙</button>
+        <button class="key macro jp2 macro-smoke app-btn" data-action="macro" data-value="MACRO_C">喫煙</button>
+        <button class="key macro en3 macro-neutral app-btn" data-action="macro" data-value="MACRO_D">ESC</button>
 
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_E">切替</button>
+        <button class="key macro jp2 macro-neutral app-btn" data-action="macro" data-value="MACRO_E">切替</button>
         <div id="display" class="display-cell">000</div>
         <button class="key fn app-btn" data-action="backspace">BS</button>
 
         <button class="key num app-btn" data-action="append" data-value="7">7</button>
         <button class="key num app-btn" data-action="append" data-value="8">8</button>
         <button class="key num app-btn" data-action="append" data-value="9">9</button>
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_F">退店</button>
+        <button class="key macro jp2 macro-leave app-btn" data-action="macro" data-value="MACRO_F">退店</button>
 
         <button class="key num app-btn" data-action="append" data-value="4">4</button>
         <button class="key num app-btn" data-action="append" data-value="5">5</button>
         <button class="key num app-btn" data-action="append" data-value="6">6</button>
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_G">外出</button>
+        <button class="key macro jp2 macro-out app-btn" data-action="macro" data-value="MACRO_G">外出</button>
 
         <button class="key num app-btn" data-action="append" data-value="1">1</button>
         <button class="key num app-btn" data-action="append" data-value="2">2</button>
         <button class="key num app-btn" data-action="append" data-value="3">3</button>
-        <button class="key macro jp2 app-btn" data-action="macro" data-value="MACRO_H">入室</button>
+        <button class="key macro jp2 macro-enter app-btn" data-action="macro" data-value="MACRO_H">入店</button>
 
         <button class="key num zero-wide app-btn" data-action="append" data-value="0">0</button>
         <button class="key enter app-btn" data-action="send">ENT</button>
