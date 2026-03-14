@@ -149,22 +149,35 @@
       font-size:24px;
       font-weight:800;
       touch-action:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      line-height:1;
+      padding:4px;
+      overflow:hidden;
     }
 
     .macro{
       background:var(--macro);
-      font-size:21px;
+      font-size:clamp(24px, 4.5vw, 36px);
+      font-weight:900;
+      letter-spacing:0;
+    }
+
+    .macro.long{
+      font-size:clamp(20px, 4vw, 30px);
     }
 
     .fn{
       background:var(--fn);
-      font-size:19px;
+      font-size:22px;
     }
 
     .enter{
       background:var(--green);
       color:#072317;
-      font-size:20px;
+      font-size:24px;
     }
 
     .display-cell{
@@ -201,15 +214,19 @@
       }
 
       .macro{
-        font-size:19px;
+        font-size:clamp(20px, 5vw, 30px);
+      }
+
+      .macro.long{
+        font-size:clamp(17px, 4.2vw, 24px);
       }
 
       .fn{
-        font-size:17px;
+        font-size:19px;
       }
 
       .enter{
-        font-size:18px;
+        font-size:20px;
       }
 
       .display-cell{
@@ -232,29 +249,29 @@
 
     <div class="card pad-card">
       <div class="pad-grid">
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_A">A</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_B">B</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_C">C</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_D">D</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_A">空席</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_B">禁煙</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_C">喫煙</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_D">ESC</button>
 
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_E">E</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_E">切替</button>
         <div id="display" class="display-cell">000</div>
         <button class="key fn app-btn" data-action="backspace">BS</button>
 
         <button class="key app-btn" data-action="append" data-value="7">7</button>
         <button class="key app-btn" data-action="append" data-value="8">8</button>
         <button class="key app-btn" data-action="append" data-value="9">9</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_F">F</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_F">退店</button>
 
         <button class="key app-btn" data-action="append" data-value="4">4</button>
         <button class="key app-btn" data-action="append" data-value="5">5</button>
         <button class="key app-btn" data-action="append" data-value="6">6</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_G">G</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_G">外出</button>
 
         <button class="key app-btn" data-action="append" data-value="1">1</button>
         <button class="key app-btn" data-action="append" data-value="2">2</button>
         <button class="key app-btn" data-action="append" data-value="3">3</button>
-        <button class="key macro app-btn" data-action="macro" data-value="MACRO_H">H</button>
+        <button class="key macro long app-btn" data-action="macro" data-value="MACRO_H">入室</button>
 
         <button class="key zero-wide app-btn" data-action="append" data-value="0">0</button>
         <button class="key enter app-btn" data-action="send">ENT</button>
