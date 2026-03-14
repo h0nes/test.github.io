@@ -1,48 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Test</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Bluetooth Minimal Test</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 24px;
+    }
 
-<style>
-body{
- background:black;
- color:white;
- font-size:40px;
- text-align:center;
-}
+    button {
+      width: 220px;
+      height: 64px;
+      font-size: 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 12px;
+    }
 
-button{
- width:80px;
- height:80px;
- font-size:30px;
- margin:5px;
-}
-</style>
-
+    #log {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      text-align: left;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #222;
+      padding: 16px;
+      border-radius: 12px;
+      min-height: 180px;
+    }
+  </style>
 </head>
-
 <body>
+  <h1>Web Bluetooth 最小テスト</h1>
 
-<div id="display">0</div>
+  <button id="checkBtn">Bluetooth対応確認</button>
+  <button id="scanBtn">デバイス選択を開く</button>
 
-<br>
+  <div id="log">起動しました</div>
 
-<button onclick="add(1)">1</button>
-<button onclick="add(2)">2</button>
-<button onclick="add(3)">3</button>
+  <script>
+    const logEl = document.getElementById("log");
 
-<script>
+    function log(message) {
+      console.log(message);
+      logEl.textContent += "\n" + message;
+    }
 
-var input="";
+    document.getElementById("checkBtn").addEventListener("click", async () => {
+      log("----- 対応確認 -----");
+      log("location.href = " + location.href);
+      log("isSecureContext = " + isSecureContext);
 
-function add(n){
- input=input+n;
- document.getElementById("display").innerHTML=input;
-}
+      if (!("bluetooth" in navigator)) {
+        log("navigator.bluetooth は存在しません");
+        return;
+      }
 
-</script>
+      log("navigator.bluetooth は存在します");
 
+      try {
+        if (typeof navigator.bluetooth.getAvailability === "function") {
+          const available = await navigator.bluetooth.getAvailability();
+          log("getAvailability() = " + available);
+        } else {
+          log("getAvailability() は未対応です");
+        }
+      } catch (e) {
+        log("getAvailability() エラー: " + e.message);
+      }
+    });
+
+    document.getElementById("scanBtn").addEventListener("click", async () => {
+      log("----- requestDevice 実行 -----");
+
+      if (!("bluetooth" in navigator)) {
+        log("navigator.bluetooth が無いため実行できません");
+        return;
+      }
+
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: []
+        });
+
+        log("デバイス選択成功");
+        log("name = " + (device.name || "(名前なし)"));
+        log("id = " + device.id);
+      } catch (e) {
+        log("requestDevice エラー: " + e.message);
+      }
+    });
+  </script>
 </body>
 </html>
