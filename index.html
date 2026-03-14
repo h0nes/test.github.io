@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test</title>
+
+<style>
+body{
+ background:black;
+ color:white;
+ font-size:40px;
+ text-align:center;
+}
+
+button{
+ width:80px;
+ height:80px;
+ font-size:30px;
+ margin:5px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="display">0</div>
+
+<br>
+
+<button onclick="add(1)">1</button>
+<button onclick="add(2)">2</button>
+<button onclick="add(3)">3</button>
+
+<script>
+
+var input="";
+
+function add(n){
+ input=input+n;
+ document.getElementById("display").innerHTML=input;
+}
+
+</script>
+
+</body>
+</html>
