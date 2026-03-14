@@ -456,8 +456,25 @@
     }
 
     async function sendMacro(name){
-      await sendText(name + "\n");
+    if (name === "MACRO_F" || name === "MACRO_G") {
+      if (inputBuffer.length === 0) {
+        setStatus("番号が未入力です");
+        return;
+      }
+  
+      const ok1 = await sendText("NUM:" + inputBuffer + "\n");
+      if (!ok1) return;
+  
+      const ok2 = await sendText(name + "\n");
+      if (!ok2) return;
+  
+      clearInput();
+      return;
     }
+  
+    await sendText(name + "\n");
+  }
+
 
     function runAction(button){
       const action = button.dataset.action;
