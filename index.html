@@ -2,20 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  >
   <title>XIAO BLE Keypad</title>
+
   <style>
     :root{
       --bg:#0b0f16;
       --panel:#141b27;
       --panel2:#1b2332;
       --key:#2a3445;
-      --key2:#445268;
       --text:#ffffff;
       --sub:#b8c2d0;
       --blue:#56a8ff;
       --red:#ff6677;
       --green:#49e09b;
+      --macro:#5d6f89;
+      --fn:#566781;
       --border:#334157;
       --shadow:0 10px 28px rgba(0,0,0,.35);
       --radius:18px;
@@ -25,135 +30,165 @@
     *{
       box-sizing:border-box;
       -webkit-tap-highlight-color:transparent;
+      -webkit-touch-callout:none;
+      -webkit-user-select:none;
+      user-select:none;
     }
 
     html, body{
       margin:0;
+      width:100%;
+      height:100%;
+      overflow:hidden;
       background:var(--bg);
       color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      touch-action:manipulation;
+      overscroll-behavior:none;
+      position:fixed;
     }
 
     body{
-      padding:14px;
+      padding:10px;
     }
 
     .app{
+      width:100%;
       max-width:560px;
+      height:calc(100dvh - 20px);
       margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      overflow:hidden;
     }
 
     .card{
       background:var(--panel);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:14px;
-      margin-bottom:14px;
+      padding:12px;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+
+    .card.header-card{
+      padding-bottom:10px;
     }
 
     .title{
-      font-size:clamp(22px, 5vw, 34px);
+      font-size:clamp(20px, 4.8vw, 32px);
       font-weight:800;
-      margin-bottom:12px;
+      margin-bottom:10px;
       letter-spacing:.02em;
+      line-height:1.15;
     }
 
     .topbar{
       display:grid;
       grid-template-columns:1fr auto auto;
-      gap:10px;
+      gap:8px;
       align-items:center;
     }
 
     .status{
-      min-height:44px;
+      min-height:40px;
       background:var(--panel2);
       border-radius:14px;
       border:1px solid rgba(255,255,255,.04);
       color:var(--sub);
       display:flex;
       align-items:center;
-      padding:0 14px;
+      padding:0 12px;
       overflow:hidden;
       white-space:nowrap;
       text-overflow:ellipsis;
-      font-size:15px;
+      font-size:14px;
     }
 
     .mini-btn{
-      height:44px;
-      min-width:86px;
+      height:40px;
+      min-width:74px;
       border:none;
       border-radius:14px;
       color:#fff;
-      font-size:18px;
+      font-size:16px;
       font-weight:800;
-      padding:0 16px;
+      padding:0 12px;
       box-shadow:var(--shadow);
+      touch-action:manipulation;
     }
 
     .connect{ background:var(--blue); }
     .disconnect{ background:var(--red); }
 
     .display-wrap{
-      margin-top:12px;
+      margin-top:10px;
     }
 
     .display-label{
       color:var(--sub);
-      font-size:14px;
-      margin-bottom:8px;
+      font-size:13px;
+      margin-bottom:6px;
     }
 
     .display{
-      min-height:72px;
+      min-height:62px;
       border-radius:16px;
       border:2px solid var(--border);
       background:#050912;
-      padding:14px 16px;
-      font-size:42px;
+      padding:12px 14px;
+      font-size:34px;
       font-weight:800;
       letter-spacing:.03em;
-      overflow-wrap:anywhere;
+      overflow:hidden;
+      word-break:break-all;
       display:flex;
       align-items:center;
+    }
+
+    .pad-card{
+      flex:1 1 auto;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
     }
 
     .pad-title{
       font-size:18px;
       font-weight:800;
-      margin-bottom:12px;
+      margin-bottom:10px;
+      flex:0 0 auto;
     }
 
     .pad-grid{
+      flex:1 1 auto;
+      min-height:0;
       display:grid;
       grid-template-columns:repeat(4, 1fr);
+      grid-template-rows:repeat(4, 1fr);
       gap:var(--gap);
     }
 
     .key{
       border:none;
       border-radius:18px;
-      min-height:84px;
       background:var(--key);
       color:#fff;
       font-size:28px;
       font-weight:800;
       box-shadow:var(--shadow);
-    }
-
-    .key:active,
-    .mini-btn:active{
-      transform:scale(0.98);
+      touch-action:manipulation;
+      min-height:0;
     }
 
     .fn{
-      background:#566781;
+      background:var(--fn);
       font-size:20px;
     }
 
     .macro{
-      background:#5d6f89;
+      background:var(--macro);
       font-size:24px;
     }
 
@@ -167,37 +202,56 @@
       grid-column:2 / span 2;
     }
 
+    .key:active,
+    .mini-btn:active{
+      transform:scale(0.98);
+    }
+
     @media (max-width:430px){
       body{
-        padding:10px;
+        padding:8px;
       }
 
-      .card{
-        padding:12px;
-        margin-bottom:12px;
-      }
-
-      .topbar{
-        grid-template-columns:1fr auto auto;
+      .app{
+        height:calc(100dvh - 16px);
         gap:8px;
       }
 
+      .card{
+        padding:10px;
+      }
+
+      .title{
+        font-size:clamp(18px, 4.6vw, 28px);
+        margin-bottom:8px;
+      }
+
+      .topbar{
+        gap:6px;
+      }
+
       .status{
-        min-height:40px;
+        min-height:38px;
         font-size:13px;
         padding:0 10px;
       }
 
       .mini-btn{
-        height:40px;
-        min-width:72px;
-        font-size:16px;
-        padding:0 12px;
+        height:38px;
+        min-width:68px;
+        font-size:15px;
+        padding:0 10px;
       }
 
       .display{
-        min-height:64px;
-        font-size:36px;
+        min-height:56px;
+        font-size:30px;
+        padding:10px 12px;
+      }
+
+      .pad-title{
+        font-size:17px;
+        margin-bottom:8px;
       }
 
       .pad-grid{
@@ -205,7 +259,6 @@
       }
 
       .key{
-        min-height:74px;
         font-size:24px;
         border-radius:16px;
       }
@@ -226,7 +279,7 @@
 </head>
 <body>
   <div class="app">
-    <div class="card">
+    <div class="card header-card">
       <div class="title">XIAO BLE テンキー + マクロパッド</div>
 
       <div class="topbar">
@@ -241,7 +294,7 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card pad-card">
       <div class="pad-title">テンキー</div>
 
       <div class="pad-grid">
@@ -276,6 +329,7 @@
     let service = null;
     let rxChar = null;
     let inputBuffer = "";
+    let lastTouchEnd = 0;
 
     const statusEl = document.getElementById("status");
     const displayEl = document.getElementById("display");
@@ -322,7 +376,7 @@
 
         setStatus("接続完了: " + (device.name || "名称不明"));
       }catch(e){
-        setStatus("接続失敗: " + (e && (e.message || e.name)) || String(e));
+        setStatus("接続失敗: " + (((e && (e.message || e.name)) || String(e))));
       }
     }
 
@@ -344,7 +398,7 @@
         rxChar = null;
         setStatus("手動で切断しました");
       }catch(e){
-        setStatus("切断失敗: " + ((e && (e.message || e.name)) || String(e)));
+        setStatus("切断失敗: " + (((e && (e.message || e.name)) || String(e))));
       }
     }
 
@@ -360,7 +414,7 @@
         setStatus("送信: " + text.replace(/\n/g, "\\n"));
         return true;
       }catch(e){
-        setStatus("送信失敗: " + ((e && (e.message || e.name)) || String(e)));
+        setStatus("送信失敗: " + (((e && (e.message || e.name)) || String(e))));
         return false;
       }
     }
@@ -380,6 +434,34 @@
     async function sendMacro(name){
       await sendText(name + "\n");
     }
+
+    document.addEventListener("touchmove", function(event){
+      event.preventDefault();
+    }, { passive:false });
+
+    document.addEventListener("gesturestart", function(event){
+      event.preventDefault();
+    }, { passive:false });
+
+    document.addEventListener("gesturechange", function(event){
+      event.preventDefault();
+    }, { passive:false });
+
+    document.addEventListener("gestureend", function(event){
+      event.preventDefault();
+    }, { passive:false });
+
+    document.addEventListener("dblclick", function(event){
+      event.preventDefault();
+    }, { passive:false });
+
+    document.addEventListener("touchend", function(event){
+      const now = Date.now();
+      if(now - lastTouchEnd <= 300){
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive:false });
 
     updateDisplay();
   </script>
