@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   >
-  <title>BLE MACRO</title>
+  <title>XIAO BLE Keypad</title>
 
   <style>
     :root{
@@ -124,6 +124,10 @@
 
     .display-wrap{
       margin-top:10px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
     }
 
     .display-label{
@@ -132,7 +136,15 @@
       margin-bottom:6px;
     }
 
+    .display-box{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      flex:1;
+    }
+
     .display{
+      width:150px;
       min-height:62px;
       border-radius:16px;
       border:2px solid var(--border);
@@ -140,11 +152,12 @@
       padding:12px 14px;
       font-size:34px;
       font-weight:800;
-      letter-spacing:.03em;
+      letter-spacing:.12em;
       overflow:hidden;
-      word-break:break-all;
       display:flex;
       align-items:center;
+      justify-content:flex-end;
+      font-variant-numeric: tabular-nums;
     }
 
     .pad-card{
@@ -166,7 +179,7 @@
       min-height:0;
       display:grid;
       grid-template-columns:repeat(4, 1fr);
-      grid-template-rows:repeat(4, 1fr);
+      grid-template-rows:repeat(5, 1fr);
       gap:var(--gap);
     }
 
@@ -198,8 +211,9 @@
       font-size:22px;
     }
 
-    .zero{
-      grid-column:2 / span 2;
+    .empty{
+      visibility:hidden;
+      pointer-events:none;
     }
 
     .key:active,
@@ -244,6 +258,7 @@
       }
 
       .display{
+        width:132px;
         min-height:56px;
         font-size:30px;
         padding:10px 12px;
@@ -289,8 +304,10 @@
       </div>
 
       <div class="display-wrap">
-        <div class="display-label">入力中</div>
-        <div id="display" class="display"></div>
+        <div class="display-box">
+          <div class="display-label">入力中</div>
+          <div id="display" class="display"></div>
+        </div>
       </div>
     </div>
 
@@ -314,8 +331,14 @@
         <button class="key macro app-btn" data-action="macro" data-value="MACRO_C">C</button>
 
         <button class="key fn app-btn" data-action="backspace">BS</button>
-        <button class="key zero app-btn" data-action="append" data-value="0">0</button>
+        <button class="key app-btn" data-action="append" data-value="0">0</button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_D">D</button>
         <button class="key enter app-btn" data-action="send">Ent</button>
+
+        <button class="key empty" tabindex="-1" aria-hidden="true"></button>
+        <button class="key empty" tabindex="-1" aria-hidden="true"></button>
+        <button class="key macro app-btn" data-action="macro" data-value="MACRO_E">E</button>
+        <button class="key empty" tabindex="-1" aria-hidden="true"></button>
       </div>
     </div>
   </div>
@@ -345,6 +368,7 @@
     }
 
     function appendInput(char){
+      if (inputBuffer.length >= 3) return;
       inputBuffer += char;
       updateDisplay();
     }
