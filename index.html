@@ -31,6 +31,7 @@
       --seat-leave:#ff5a6e;
       --seat-out:#ff9f43;
       --seat-enter:#2ec9c3;
+      --seat-order:#f4c542;
 
       --macro-neutral:#6b7c99;
       --fn:#5f708c;
@@ -215,6 +216,12 @@
     .macro-enter{
       background:var(--seat-enter);
     }
+    
+    .macro-order{
+      background:var(--seat-order);
+      color:#2b2100;
+      text-shadow:none;
+    }
 
     .fn{
       background:var(--fn);
@@ -334,7 +341,7 @@
         <button class="key num app-btn" data-action="append" data-value="1">1</button>
         <button class="key num app-btn" data-action="append" data-value="2">2</button>
         <button class="key num app-btn" data-action="append" data-value="3">3</button>
-        <button class="key macro jp2 macro-neutral app-btn" data-action="macro" data-value="MACRO_H">注文</button>
+        <button class="key macro jp2 macro-order app-btn" data-action="macro" data-value="MACRO_H">注文</button>
 
         <button class="key num zero-wide app-btn" data-action="append" data-value="0">0</button>
         <button class="key enter app-btn" data-action="enterkey">ENT</button>
