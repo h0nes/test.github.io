@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   >
-  <title>POS ASSIST TOOL</title>
+  <title>XIAO BLE Macro Keypad</title>
 
   <style>
     :root{
@@ -216,7 +216,7 @@
     .macro-enter{
       background:var(--seat-enter);
     }
-    
+
     .macro-order{
       background:var(--seat-order);
       color:#2b2100;
@@ -225,7 +225,7 @@
 
     .fn{
       background:var(--fn);
-      font-size:clamp(28px, 7vw, 38px);
+      font-size:clamp(22px, 5.5vw, 30px);
       font-weight:900;
     }
 
@@ -292,7 +292,7 @@
       }
 
       .fn{
-        font-size:clamp(24px, 6.8vw, 34px);
+        font-size:clamp(18px, 5vw, 24px);
       }
 
       .enter{
@@ -308,7 +308,7 @@
 <body>
   <div class="app">
     <div class="card">
-      <div class="title">POS ASSIST TOOL</div>
+      <div class="title">XIAO BLE テンキー + マクロパッド</div>
 
       <div class="topbar">
         <div id="status" class="status">未接続</div>
@@ -326,7 +326,7 @@
 
         <button class="key macro en3 macro-neutral app-btn" data-action="macro" data-value="MACRO_E">ESC</button>
         <div id="display" class="display-cell">000</div>
-        <button class="key fn app-btn" data-action="backspace">BS</button>
+        <button class="key fn app-btn" data-action="clear">クリア</button>
 
         <button class="key num app-btn" data-action="append" data-value="7">7</button>
         <button class="key num app-btn" data-action="append" data-value="8">8</button>
@@ -376,11 +376,6 @@
     function appendInput(char){
       if (inputBuffer.length >= 3) return;
       inputBuffer += char;
-      updateDisplay();
-    }
-
-    function backspaceInput(){
-      inputBuffer = inputBuffer.slice(0, -1);
       updateDisplay();
     }
 
@@ -490,8 +485,8 @@
         case "append":
           appendInput(value);
           break;
-        case "backspace":
-          backspaceInput();
+        case "clear":
+          clearInput();
           break;
         case "enterkey":
           sendEnterKey();
