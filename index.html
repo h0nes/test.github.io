@@ -301,7 +301,7 @@
 <body>
   <div class="app">
     <div class="card">
-      <div class="title">XIAO BLE テンキー + マクロパッド</div>
+      <div class="title">POS ASSIST TOOL</div>
 
       <div class="topbar">
         <div id="status" class="status">未接続</div>
@@ -315,9 +315,9 @@
         <button class="key macro jp2 macro-vacant app-btn" data-action="macro" data-value="MACRO_A">空席</button>
         <button class="key macro jp2 macro-nosmoke app-btn" data-action="macro" data-value="MACRO_B">禁煙</button>
         <button class="key macro jp2 macro-smoke app-btn" data-action="macro" data-value="MACRO_C">喫煙</button>
-        <button class="key macro en3 macro-neutral app-btn" data-action="macro" data-value="MACRO_D">ESC</button>
+        <button class="key macro jp2 macro-enter app-btn" data-action="macro" data-value="MACRO_D">入店</button>
 
-        <button class="key macro jp2 macro-neutral app-btn" data-action="macro" data-value="MACRO_E">切替</button>
+        <button class="key macro en3 macro-neutral app-btn" data-action="macro" data-value="MACRO_E">ESC</button>
         <div id="display" class="display-cell">000</div>
         <button class="key fn app-btn" data-action="backspace">BS</button>
 
@@ -334,10 +334,10 @@
         <button class="key num app-btn" data-action="append" data-value="1">1</button>
         <button class="key num app-btn" data-action="append" data-value="2">2</button>
         <button class="key num app-btn" data-action="append" data-value="3">3</button>
-        <button class="key macro jp2 macro-enter app-btn" data-action="macro" data-value="MACRO_H">入店</button>
+        <button class="key macro jp2 macro-neutral app-btn" data-action="macro" data-value="MACRO_H">注文</button>
 
         <button class="key num zero-wide app-btn" data-action="append" data-value="0">0</button>
-        <button class="key enter app-btn" data-action="send">ENT</button>
+        <button class="key enter app-btn" data-action="enterkey">ENT</button>
       </div>
     </div>
   </div>
@@ -443,38 +443,31 @@
       }
     }
 
-    async function sendCurrentInput(){
-      if(inputBuffer.length === 0){
-        setStatus("入力が空です");
-        return;
-      }
-
-      const ok = await sendText("NUM:" + inputBuffer + "\n");
-      if(ok){
-        clearInput();
-      }
+    async function sendEnterKey(){
+      await sendText("MACRO_ENT\n");
     }
 
     async function sendMacro(name){
-    if (name === "MACRO_F" || name === "MACRO_G") {
-      if (inputBuffer.length === 0) {
-        setStatus("番号が未入力です");
+      const needsNumber = ["MACRO_F", "MACRO_G", "MACRO_H"];
+
+      if (needsNumber.includes(name)) {
+        if (inputBuffer.length === 0) {
+          setStatus("番号が未入力です");
+          return;
+        }
+
+        const ok1 = await sendText("NUM:" + inputBuffer + "\n");
+        if (!ok1) return;
+
+        const ok2 = await sendText(name + "\n");
+        if (!ok2) return;
+
+        clearInput();
         return;
       }
-  
-      const ok1 = await sendText("NUM:" + inputBuffer + "\n");
-      if (!ok1) return;
-  
-      const ok2 = await sendText(name + "\n");
-      if (!ok2) return;
-  
-      clearInput();
-      return;
-    }
-  
-    await sendText(name + "\n");
-  }
 
+      await sendText(name + "\n");
+    }
 
     function runAction(button){
       const action = button.dataset.action;
@@ -493,11 +486,8 @@
         case "backspace":
           backspaceInput();
           break;
-        case "clear":
-          clearInput();
-          break;
-        case "send":
-          sendCurrentInput();
+        case "enterkey":
+          sendEnterKey();
           break;
         case "macro":
           sendMacro(value);
