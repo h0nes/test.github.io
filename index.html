@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   >
-  <title>POS Assist System</title>
+  <title>POS Assist System beta</title>
 
   <style>
     :root{
@@ -1128,16 +1128,25 @@
     function renderPickerState(){
       const roomLabel = enterState.selectedRoom || "タップしてえらぶ";
       const courseLabel = enterState.selectedCourse || "タップしてえらぶ";
+      const now = new Date();
+      const nightSwapActive = isNightCourseSwapTime(now);
 
       roomSelectBtn.querySelector(".value").textContent = roomLabel;
       courseSelectBtn.querySelector(".value").textContent = courseLabel;
       roomSelectBtn.classList.toggle("selected", !!enterState.selectedRoom);
       courseSelectBtn.classList.toggle("selected", !!enterState.selectedCourse);
 
-      enterState.holidayPricing = isHolidayPricingPeriod(new Date());
-      courseOrderNoteEl.textContent = enterState.holidayPricing
+      enterState.holidayPricing = isHolidayPricingPeriod(now);
+
+      let orderNote = enterState.holidayPricing
         ? "現在は休日料金順で表示します（休日が上・平日が下）。"
         : "現在は通常順で表示します（平日が上・休日が下）。";
+
+      if (nightSwapActive) {
+        orderNote += " 18:00〜翌4:00のため、9時間・12時間とナイト9時間・ナイト12時間を入れ替えて表示します。";
+      }
+
+      courseOrderNoteEl.textContent = orderNote;
     }
 
     function moveToEnterDetails(){
@@ -1237,11 +1246,37 @@
       setStatus(`部屋番号: ${enterState.selectedRoom}`);
     }
 
+    function isNightCourseSwapTime(now){
+      const hour = now.getHours();
+      return hour >= 18 || hour < 4;
+    }
+
+    function reorderNightCoursesForDisplay(items){
+      const reordered = [...items];
+      const swapById = (baseSuffix, nightSuffix) => {
+        const baseIndex = reordered.findIndex((item) => item.id.endsWith(baseSuffix));
+        const nightIndex = reordered.findIndex((item) => item.id.endsWith(nightSuffix));
+        if (baseIndex >= 0 && nightIndex >= 0) {
+          [reordered[baseIndex], reordered[nightIndex]] = [reordered[nightIndex], reordered[baseIndex]];
+        }
+      };
+
+      swapById('_9', '_night9');
+      swapById('_12', '_night12');
+      return reordered;
+    }
+
     function getDisplayedCourses(key, holidayPricing){
       const source = COURSE_CATALOG[key] || [];
       const fixed = source.filter((item) => !item.bucket);
-      const weekday = source.filter((item) => item.bucket === "weekday");
-      const holiday = source.filter((item) => item.bucket === "holiday");
+      let weekday = source.filter((item) => item.bucket === "weekday");
+      let holiday = source.filter((item) => item.bucket === "holiday");
+
+      if (isNightCourseSwapTime(new Date())) {
+        weekday = reorderNightCoursesForDisplay(weekday);
+        holiday = reorderNightCoursesForDisplay(holiday);
+      }
+
       return holidayPricing
         ? [...fixed, ...holiday, ...weekday]
         : [...fixed, ...weekday, ...holiday];
@@ -1286,12 +1321,14 @@
 
     function renderCourseList(title, items, backTarget){
       enterState.courseBackTarget = backTarget;
-      enterState.holidayPricing = isHolidayPricingPeriod(new Date());
+      const now = new Date();
+      const nightSwapActive = isNightCourseSwapTime(now);
+      enterState.holidayPricing = isHolidayPricingPeriod(now);
       courseListTitleEl.textContent = title;
       courseListBackBtn.dataset.backTarget = backTarget;
       courseHolidayBadgeEl.textContent = enterState.holidayPricing
-        ? "休日料金順で表示中"
-        : "平日料金順で表示中";
+        ? (nightSwapActive ? "休日料金順 / ナイト順切替中" : "休日料金順で表示中")
+        : (nightSwapActive ? "平日料金順 / ナイト順切替中" : "平日料金順で表示中");
       courseListGridEl.innerHTML = items.map((item) => {
         return `<button class="course-btn app-btn" data-action="select-course" data-value="${item.id}">${item.label}</button>`;
       }).join("");
