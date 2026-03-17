@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   >
-  <title>POS Assist System beta</title>
+  <title>POS Assist System β</title>
 
   <style>
     :root{
@@ -126,7 +126,7 @@
       font-weight:900;
       padding:0 10px;
       box-shadow:var(--shadow);
-      touch-action:none;
+      touch-action:manipulation;
       position:relative;
       overflow:hidden;
       isolation:isolate;
@@ -180,7 +180,7 @@
     .course-btn{
       color:#fff;
       font-weight:900;
-      touch-action:none;
+      touch-action:manipulation;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -283,6 +283,9 @@
       gap:10px;
       overflow:auto;
       padding-right:2px;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+      touch-action:pan-y;
     }
 
     .flow-screen.active{
@@ -518,6 +521,15 @@
     .course-btn{
       min-height:54px;
       font-size:clamp(18px, 4.9vw, 24px);
+    }
+
+    .room-grid,
+    .course-list-grid,
+    .single-col-grid,
+    .option-grid,
+    .demographic-grid,
+    .age-list{
+      touch-action:pan-y;
     }
 
     .small-btn{
@@ -820,7 +832,7 @@
           </div>
         </div>
 
-        <div id="enterScreenLockerGender" class="flow-screen"> class="flow-screen">
+        <div id="enterScreenLockerGender" class="flow-screen">
           <div class="flow-title">性別を選択</div>
           <div class="single-col-grid">
             <button class="option-btn app-btn" data-action="open-locker-group" data-value="男性ロッカー">男性ロッカー</button>
@@ -984,8 +996,13 @@
     let inputBuffer = "";
     let lastTouchEnd = 0;
     let isExecutingEnter = false;
-    const handledTouches = new WeakSet();
+    const cancelNextClick = new WeakSet();
     const holidayCache = new Map();
+    let activeTouchButton = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchMoved = false;
+    const TOUCH_SCROLL_THRESHOLD = 10;
 
     const enterState = {
       customerType: "",
@@ -1150,16 +1167,22 @@
       enterState.customerType = "非会員";
       enterState.gender = button.dataset.gender || "";
       enterState.age = button.dataset.age || "";
-      moveToEnterDetails();
 
       const guestCode = AGE_CODE_MAP[enterState.gender]?.[enterState.age];
+      let sent = false;
+
+      if (guestCode && rxChar) {
+        sent = await executeGuestDemographicMacro(guestCode);
+      }
+
+      moveToEnterDetails();
+
       if (!guestCode) {
         setStatus(`非会員 ${enterState.gender} ${enterState.age} を選択しました`);
         return;
       }
 
-      const ok = await sendGuestDemographicMacro(guestCode);
-      if (ok) {
+      if (sent) {
         setStatus(`非会員 ${enterState.gender} ${enterState.age} を送信しました`);
       } else if (!rxChar) {
         setStatus(`非会員 ${enterState.gender} ${enterState.age} を選択しました（未接続）`);
@@ -1720,26 +1743,36 @@
     document.addEventListener("touchstart", function(event){
       const button = getButtonFromEvent(event);
       if (!button) return;
+      const touch = event.touches && event.touches[0];
+      activeTouchButton = button;
+      touchStartX = touch ? touch.clientX : 0;
+      touchStartY = touch ? touch.clientY : 0;
+      touchMoved = false;
       event.stopPropagation();
-      handledTouches.add(button);
       setPressing(button, true);
-      triggerPressEffect(button);
     }, { passive:false });
 
     document.addEventListener("click", function(event){
       const button = getButtonFromEvent(event);
       if (!button) return;
+      if (cancelNextClick.has(button)) {
+        cancelNextClick.delete(button);
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
-      if (handledTouches.has(button)) {
-        handledTouches.delete(button);
-      } else {
-        triggerPressEffect(button);
-      }
+      triggerPressEffect(button);
       runAction(button);
     }, { passive:false });
 
     document.addEventListener("touchend", function(event){
+      if (activeTouchButton && touchMoved) {
+        cancelNextClick.add(activeTouchButton);
+      }
+      activeTouchButton = null;
+      touchMoved = false;
       clearAllPressing();
       const now = Date.now();
       if(now - lastTouchEnd <= 350){
@@ -1749,6 +1782,8 @@
     }, { passive:false });
 
     document.addEventListener("touchcancel", function(){
+      activeTouchButton = null;
+      touchMoved = false;
       clearAllPressing();
     }, { passive:false });
 
@@ -1766,6 +1801,17 @@
     });
 
     document.addEventListener("touchmove", function(event){
+      const touch = event.touches && event.touches[0];
+      if (activeTouchButton && touch) {
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+        if (Math.abs(dx) > TOUCH_SCROLL_THRESHOLD || Math.abs(dy) > TOUCH_SCROLL_THRESHOLD) {
+          touchMoved = true;
+          cancelNextClick.add(activeTouchButton);
+          setPressing(activeTouchButton, false);
+        }
+      }
+
       if (event.target.closest(".flow-screen.active")) {
         return;
       }
