@@ -997,6 +997,7 @@
     let inputBuffer = "";
     let lastTouchEnd = 0;
     let isExecutingEnter = false;
+    const COURSE_PAGE_SIZE = 9;
     const cancelNextClick = new WeakSet();
     const holidayCache = new Map();
     let activeTouchButton = null;
@@ -1387,6 +1388,21 @@
       return await sendCommandSequence(steps);
     }
 
+    function buildCourseMoveSteps(index){
+      const pageDownCount = Math.floor(index / COURSE_PAGE_SIZE);
+      const downCount = index % COURSE_PAGE_SIZE;
+      const steps = [];
+
+      if (pageDownCount > 0) {
+        steps.push(`REPEAT:PAGEDOWN:${pageDownCount}`);
+      }
+      if (downCount > 0) {
+        steps.push(`REPEAT:DOWN:${downCount}`);
+      }
+
+      return { steps, pageDownCount, downCount };
+    }
+
     async function executeEnterProcess(){
       if (isExecutingEnter) return;
 
@@ -1409,6 +1425,7 @@
         return;
       }
 
+      const move = buildCourseMoveSteps(enterState.selectedCourseDownCount);
       isExecutingEnter = true;
 
       const steps = [
@@ -1416,7 +1433,7 @@
         `TYPE:${roomCode}`,
         "KEY:ENTER",
         "KEY:F1",
-        `REPEAT:DOWN:${enterState.selectedCourseDownCount}`,
+        ...move.steps,
         "KEY:ENTER",
         "KEY:SHIFT"
       ];
@@ -1425,7 +1442,7 @@
       isExecutingEnter = false;
 
       if (ok) {
-        closeEnterMenu(`入店処理を実行しました: ${enterState.selectedRoom} / ${enterState.selectedCourse}`);
+        closeEnterMenu(`入店処理を実行しました: ${enterState.selectedRoom} / ${enterState.selectedCourse} / PgDn${move.pageDownCount} ↓${move.downCount}`);
       } else {
         setStatus("入店処理の送信に失敗しました");
       }
