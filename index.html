@@ -3,26 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>Bluefy テプラ3桁読取</title>
+<title>Bluefy テプラ3桁 読み取り</title>
 <style>
   :root{
     --bg:#0b0d10;
-    --card:#151922;
-    --text:#f4f7fb;
-    --muted:#9ea7b3;
-    --accent:#0aa7bf;
-    --ok:#42d392;
-    --warn:#f3c969;
-    --danger:#ff6b6b;
+    --card:#121826;
+    --card2:#0c111b;
+    --text:#eef2f7;
+    --muted:#98a3b3;
+    --accent:#19aec8;
+    --accent2:#f2cb68;
+    --btn2:#465269;
+    --ok:#4ade80;
+    --ng:#fb7185;
   }
   *{box-sizing:border-box}
-  body{
+  html,body{
     margin:0;
+    padding:0;
     background:var(--bg);
     color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
     -webkit-user-select:none;
     user-select:none;
+  }
+  body{
     touch-action:manipulation;
   }
   .wrap{
@@ -31,62 +36,67 @@
     padding:12px 12px 32px;
   }
   .card{
-    background:var(--card);
-    border-radius:18px;
-    padding:12px;
-    margin-bottom:12px;
-    box-shadow:0 6px 20px rgba(0,0,0,.28);
+    background:linear-gradient(180deg,#101726 0%, #0b1019 100%);
+    border-radius:22px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 10px 26px rgba(0,0,0,.28);
   }
   .title{
-    font-size:18px;
-    font-weight:700;
-    margin:0 0 10px;
+    font-size:20px;
+    font-weight:800;
+    margin:0 0 14px;
   }
   .resultBox{
+    background:#070c15;
+    border-radius:18px;
+    padding:24px 12px 16px;
     text-align:center;
-    padding:18px 10px;
-    border-radius:14px;
-    background:#0f1217;
   }
   .big{
-    font-size:72px;
-    font-weight:800;
+    font-size:96px;
     line-height:1;
+    font-weight:900;
     letter-spacing:.08em;
   }
   .sub{
-    margin-top:8px;
-    font-size:15px;
-    color:var(--warn);
+    margin-top:10px;
+    font-size:16px;
+    color:var(--accent2);
+    font-weight:700;
   }
   .controls{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:12px;
+    gap:12px;
+    margin-top:14px;
   }
   button{
     appearance:none;
     border:none;
-    border-radius:14px;
-    padding:16px 14px;
-    font-size:20px;
-    font-weight:800;
+    border-radius:18px;
+    padding:18px 14px;
     color:#fff;
+    font-size:22px;
+    font-weight:900;
     background:var(--accent);
     touch-action:manipulation;
   }
-  button:active{transform:scale(.99)}
-  .secondary{background:#394150}
-  .danger{background:#b43f4a}
+  button.secondary{
+    background:var(--btn2);
+  }
+  button:active{
+    transform:scale(.99);
+  }
+
   .videoWrap{
     position:relative;
     overflow:hidden;
-    border-radius:18px;
+    border-radius:22px;
     background:#000;
     aspect-ratio:3/4;
   }
-  video, canvas.preview{
+  video{
     width:100%;
     height:100%;
     object-fit:cover;
@@ -99,64 +109,65 @@
   }
   .guide{
     position:absolute;
-    left:12%;
-    top:38%;
-    width:76%;
-    height:16%;
-    border:3px solid rgba(255,220,120,.95);
-    border-radius:12px;
-    box-shadow:0 0 0 9999px rgba(0,0,0,.30);
+    left:30%;
+    top:58%;
+    width:56%;
+    height:13%;
+    border:4px solid rgba(255,220,120,.95);
+    border-radius:16px;
+    box-shadow:0 0 0 9999px rgba(0,0,0,.20);
   }
   .guideText{
     position:absolute;
     left:0;
     right:0;
-    top:calc(38% - 28px);
+    top:calc(58% - 34px);
     text-align:center;
-    font-size:14px;
-    color:#ffe08a;
-    font-weight:700;
-    text-shadow:0 1px 3px rgba(0,0,0,.8);
+    font-size:15px;
+    color:#f6d27a;
+    font-weight:900;
+    text-shadow:0 1px 3px rgba(0,0,0,.9);
   }
-  .row{
+  .grid2{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
+    gap:12px;
   }
-  .mini{
+  .cap{
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 6px;
+    font-weight:700;
+  }
+  canvas{
     width:100%;
-    border-radius:12px;
     background:#000;
+    border-radius:14px;
     display:block;
   }
   .log{
-    background:#0b0e13;
-    border-radius:14px;
-    padding:10px;
-    height:220px;
+    background:#060b12;
+    border-radius:16px;
+    padding:12px;
+    height:260px;
     overflow:auto;
     white-space:pre-wrap;
-    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     font-size:14px;
     line-height:1.45;
   }
   .hint{
-    color:var(--muted);
     font-size:14px;
-    line-height:1.6;
+    color:var(--muted);
+    line-height:1.7;
   }
-  .badge{
-    display:inline-block;
-    padding:4px 8px;
-    border-radius:999px;
-    background:#222934;
-    color:#cbd5e1;
-    font-size:12px;
-    font-weight:700;
-    margin-right:6px;
+  .status{
+    margin-top:8px;
+    font-size:14px;
+    font-weight:800;
   }
-  .statusOK{color:var(--ok)}
-  .statusNG{color:var(--danger)}
+  .ok{ color:var(--ok); }
+  .ng{ color:var(--ng); }
 </style>
 </head>
 <body>
@@ -167,6 +178,7 @@
     <div class="resultBox">
       <div id="result" class="big">---</div>
       <div id="sub" class="sub">候補: --- / 信頼度 ---</div>
+      <div id="status" class="status ng">未確定</div>
     </div>
     <div class="controls">
       <button id="startBtn">カメラ開始</button>
@@ -187,14 +199,14 @@
 
   <div class="card">
     <div class="title">前処理プレビュー</div>
-    <div class="row">
+    <div class="grid2">
       <div>
-        <div class="badge">切り出し</div>
-        <canvas id="roiCanvas" class="mini" width="360" height="120"></canvas>
+        <div class="cap">切り出し（右寄せ）</div>
+        <canvas id="roiCanvas" width="900" height="240"></canvas>
       </div>
       <div>
-        <div class="badge">二値化</div>
-        <canvas id="binCanvas" class="mini" width="360" height="120"></canvas>
+        <div class="cap">二値化</div>
+        <canvas id="binCanvas" width="900" height="240"></canvas>
       </div>
     </div>
   </div>
@@ -207,11 +219,11 @@
   <div class="card">
     <div class="title">使い方</div>
     <div class="hint">
-      中央の枠にテプラの3桁数字を合わせてください。<br>
-      精度向上のため、ラベル部分だけがなるべく大きく写るようにしてください。<br>
-      背景が派手でも、<b>白いラベル部分を多めに枠へ入れる</b>と認識が安定しやすいです。<br>
-      Safari/BluefyではHTTPS配信が必要です。<br>
-      文字が細い場合は、少し離してからズーム気味にすると改善することがあります。
+      読み取りたいテプラの3桁が、黄色枠の右寄りに来るように合わせてください。<br>
+      この版は <b>ハイフン右側の3桁</b> を強く意識した処理です。<br>
+      例: <b>F-803 → 803</b><br>
+      余計なラベルや別文字を枠に入れないほど安定します。<br>
+      Bluefy / Safari 系では HTTPS 配信が必要です。
     </div>
   </div>
 
@@ -225,6 +237,7 @@
   const clearBtn = document.getElementById('clearBtn');
   const resultEl = document.getElementById('result');
   const subEl = document.getElementById('sub');
+  const statusEl = document.getElementById('status');
   const logEl = document.getElementById('log');
 
   const roiCanvas = document.getElementById('roiCanvas');
@@ -235,36 +248,47 @@
   let stream = null;
   let worker = null;
   let running = false;
-  let ocrBusy = false;
-  let lastAccepted = '';
-  let lastAcceptedTime = 0;
+  let busy = false;
+  let timerId = null;
 
   const recent = [];
-  const MAX_RECENT = 10;
+  const RECENT_MAX = 12;
+  let lastCommitted = '';
+  let lastCommittedAt = 0;
 
-  function addLog(text){
+  function clamp(v, min, max){
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function nowStamp(){
     const t = new Date();
-    const hh = String(t.getHours()).padStart(2,'0');
-    const mm = String(t.getMinutes()).padStart(2,'0');
-    const ss = String(t.getSeconds()).padStart(2,'0');
-    const ms = String(t.getMilliseconds()).padStart(3,'0');
-    logEl.textContent += `[${hh}:${mm}:${ss}.${ms}] ${text}\n`;
+    const hh = String(t.getHours()).padStart(2, '0');
+    const mm = String(t.getMinutes()).padStart(2, '0');
+    const ss = String(t.getSeconds()).padStart(2, '0');
+    const ms = String(t.getMilliseconds()).padStart(3, '0');
+    return `[${hh}:${mm}:${ss}.${ms}]`;
+  }
+
+  function addLog(msg){
+    logEl.textContent += `${nowStamp()} ${msg}\n`;
     logEl.scrollTop = logEl.scrollHeight;
   }
 
-  function setResult(main, sub){
-    resultEl.textContent = main;
-    subEl.textContent = sub;
+  function setResult(main, sub, stable=false){
+    resultEl.textContent = main || '---';
+    subEl.textContent = sub || '候補: --- / 信頼度 ---';
+    statusEl.textContent = stable ? '確定' : '未確定';
+    statusEl.className = 'status ' + (stable ? 'ok' : 'ng');
   }
 
-  async function initTesseract(){
+  async function initOCR(){
     if (worker) return;
     addLog('OCR初期化中...');
     worker = await Tesseract.createWorker('eng', 1, {
       logger: () => {}
     });
     await worker.setParameters({
-      tessedit_char_whitelist: '0123456789',
+      tessedit_char_whitelist: '0123456789-',
       preserve_interword_spaces: '0',
       user_defined_dpi: '300'
     });
@@ -273,8 +297,9 @@
 
   async function startCamera(){
     if (running) return;
+
     try{
-      await initTesseract();
+      await initOCR();
 
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -294,13 +319,17 @@
       loop();
     }catch(err){
       console.error(err);
-      addLog('カメラ開始失敗: ' + err.message);
-      alert('カメラを開始できませんでした。HTTPSで開いているか、カメラ権限が許可されているか確認してください。');
+      addLog('開始失敗: ' + err.message);
+      alert('カメラを開始できませんでした。HTTPSとカメラ権限を確認してください。');
     }
   }
 
   function stopCamera(){
     running = false;
+    if (timerId){
+      clearTimeout(timerId);
+      timerId = null;
+    }
     if (stream){
       stream.getTracks().forEach(t => t.stop());
       stream = null;
@@ -310,28 +339,29 @@
     addLog('カメラ停止');
   }
 
-  function clamp(v,min,max){ return Math.max(min, Math.min(max,v)); }
-
   function cropROIToCanvas(){
     if (!video.videoWidth || !video.videoHeight) return null;
 
     const vw = video.videoWidth;
     const vh = video.videoHeight;
 
-    // オーバーレイのガイドに近い比率
-    const rx = 0.12;
-    const ry = 0.38;
-    const rw = 0.76;
-    const rh = 0.16;
+    const guideX = 0.30;
+    const guideY = 0.58;
+    const guideW = 0.56;
+    const guideH = 0.13;
 
-    const sx = Math.floor(vw * rx);
-    const sy = Math.floor(vh * ry);
-    const sw = Math.floor(vw * rw);
-    const sh = Math.floor(vh * rh);
+    const gx = Math.floor(vw * guideX);
+    const gy = Math.floor(vh * guideY);
+    const gw = Math.floor(vw * guideW);
+    const gh = Math.floor(vh * guideH);
 
-    // 少し高解像度で切り出し
-    roiCanvas.width = 720;
-    roiCanvas.height = 220;
+    const sx = Math.floor(gx + gw * 0.34);
+    const sy = Math.floor(gy + gh * 0.08);
+    const sw = Math.floor(gw * 0.58);
+    const sh = Math.floor(gh * 0.84);
+
+    roiCanvas.width = 900;
+    roiCanvas.height = 240;
     roiCtx.drawImage(video, sx, sy, sw, sh, 0, 0, roiCanvas.width, roiCanvas.height);
 
     return { sx, sy, sw, sh };
@@ -339,111 +369,116 @@
 
   function enhanceGrayAndThreshold(srcCtx, dstCtx, w, h, opt = {}){
     const {
-      contrast = 1.9,
+      contrast = 2.0,
       brightness = 0,
       blur = false,
       thresholdBias = 0
     } = opt;
 
-    const img = srcCtx.getImageData(0,0,w,h);
+    const img = srcCtx.getImageData(0, 0, w, h);
     const data = img.data;
 
-    // グレースケール + コントラスト調整
-    const gray = new Uint8ClampedArray(w*h);
-    for(let i=0, p=0; i<data.length; i+=4, p++){
-      let g = data[i]*0.299 + data[i+1]*0.587 + data[i+2]*0.114;
+    const gray = new Uint8ClampedArray(w * h);
+
+    for(let i = 0, p = 0; i < data.length; i += 4, p++){
+      let g = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
       g = (g - 128) * contrast + 128 + brightness;
       gray[p] = clamp(g, 0, 255);
     }
 
-    // 軽い3x3ブラー
     let work = gray;
+
     if (blur){
-      const out = new Uint8ClampedArray(w*h);
-      for(let y=1; y<h-1; y++){
-        for(let x=1; x<w-1; x++){
+      const out = new Uint8ClampedArray(w * h);
+      for(let y = 1; y < h - 1; y++){
+        for(let x = 1; x < w - 1; x++){
           let sum = 0;
-          for(let dy=-1; dy<=1; dy++){
-            for(let dx=-1; dx<=1; dx++){
-              sum += gray[(y+dy)*w + (x+dx)];
+          for(let dy = -1; dy <= 1; dy++){
+            for(let dx = -1; dx <= 1; dx++){
+              sum += gray[(y + dy) * w + (x + dx)];
             }
           }
-          out[y*w+x] = sum / 9;
+          out[y * w + x] = sum / 9;
         }
       }
       work = out;
     }
 
-    // Otsu
     const hist = new Uint32Array(256);
-    for(let i=0; i<work.length; i++) hist[work[i]]++;
+    for(let i = 0; i < work.length; i++) hist[work[i]]++;
+
     const total = work.length;
     let sum = 0;
-    for(let i=0; i<256; i++) sum += i * hist[i];
+    for(let i = 0; i < 256; i++) sum += i * hist[i];
 
-    let sumB = 0, wB = 0, varMax = 0, th = 127;
-    for(let t=0; t<256; t++){
+    let sumB = 0;
+    let wB = 0;
+    let maxVar = 0;
+    let th = 127;
+
+    for(let t = 0; t < 256; t++){
       wB += hist[t];
       if (!wB) continue;
       const wF = total - wB;
       if (!wF) break;
+
       sumB += t * hist[t];
       const mB = sumB / wB;
       const mF = (sum - sumB) / wF;
-      const v = wB * wF * (mB - mF) * (mB - mF);
-      if (v > varMax){
-        varMax = v;
+      const variance = wB * wF * (mB - mF) * (mB - mF);
+
+      if (variance > maxVar){
+        maxVar = variance;
         th = t;
       }
     }
+
     th = clamp(th + thresholdBias, 0, 255);
 
-    // 二値化: 黒文字前提
-    const out = dstCtx.createImageData(w, h);
-    for(let i=0, p=0; p<work.length; i+=4, p++){
+    const outImg = dstCtx.createImageData(w, h);
+    for(let i = 0, p = 0; p < work.length; i += 4, p++){
       const v = work[p] < th ? 0 : 255;
-      out.data[i] = v;
-      out.data[i+1] = v;
-      out.data[i+2] = v;
-      out.data[i+3] = 255;
+      outImg.data[i] = v;
+      outImg.data[i + 1] = v;
+      outImg.data[i + 2] = v;
+      outImg.data[i + 3] = 255;
     }
-    dstCtx.putImageData(out, 0, 0);
+    dstCtx.putImageData(outImg, 0, 0);
   }
 
   function trimToContent(srcCanvas){
     const ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
-    const { width:w, height:h } = srcCanvas;
-    const img = ctx.getImageData(0,0,w,h);
+    const w = srcCanvas.width;
+    const h = srcCanvas.height;
+    const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
 
-    let minX=w, minY=h, maxX=0, maxY=0;
-    let found = false;
+    let minX = w, minY = h, maxX = -1, maxY = -1;
 
-    for(let y=0; y<h; y++){
-      for(let x=0; x<w; x++){
-        const i = (y*w + x) * 4;
-        const v = d[i]; // binary
-        if(v < 128){
-          found = true;
-          if(x < minX) minX = x;
-          if(y < minY) minY = y;
-          if(x > maxX) maxX = x;
-          if(y > maxY) maxY = y;
+    for(let y = 0; y < h; y++){
+      for(let x = 0; x < w; x++){
+        const i = (y * w + x) * 4;
+        const v = d[i];
+        if (v < 128){
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
         }
       }
     }
 
-    if(!found){
+    if (maxX < 0 || maxY < 0){
       return srcCanvas;
     }
 
-    // 余白
-    const padX = Math.floor((maxX - minX + 1) * 0.10) + 8;
+    const padX = Math.floor((maxX - minX + 1) * 0.12) + 8;
     const padY = Math.floor((maxY - minY + 1) * 0.18) + 8;
-    minX = clamp(minX - padX, 0, w-1);
-    minY = clamp(minY - padY, 0, h-1);
-    maxX = clamp(maxX + padX, 0, w-1);
-    maxY = clamp(maxY + padY, 0, h-1);
+
+    minX = clamp(minX - padX, 0, w - 1);
+    minY = clamp(minY - padY, 0, h - 1);
+    maxX = clamp(maxX + padX, 0, w - 1);
+    maxY = clamp(maxY + padY, 0, h - 1);
 
     const tw = maxX - minX + 1;
     const th = maxY - minY + 1;
@@ -460,54 +495,73 @@
     try{
       await worker.setParameters({
         tessedit_pageseg_mode: String(psm),
-        tessedit_char_whitelist: '0123456789'
+        tessedit_char_whitelist: '0123456789-'
       });
       const { data } = await worker.recognize(canvas);
-      const raw = (data.text || '').replace(/\s/g, '');
-      const digits = (raw.match(/\d/g) || []).join('');
-      const conf = typeof data.confidence === 'number' ? data.confidence / 100 : 0;
-      return { raw, digits, confidence: conf };
-    }catch(err){
+      return {
+        raw: (data.text || '').replace(/\s/g, ''),
+        confidence: typeof data.confidence === 'number' ? data.confidence / 100 : 0
+      };
+    }catch(e){
       return null;
     }
   }
 
-  function scoreCandidate(s){
-    if (!s) return -999;
-    let score = 0;
-    if (/^\d{3}$/.test(s)) score += 100;
-    if (s.length === 3) score += 15;
-    if (/^\d+$/.test(s)) score += 10;
-    return score;
+  function extractLast3Digits(text){
+    const cleaned = (text || '').replace(/\s/g, '');
+
+    let m = cleaned.match(/(\d{3})\D*$/);
+    if (m) return m[1];
+
+    m = cleaned.match(/(\d{3})/);
+    if (m) return m[1];
+
+    const digits = (cleaned.match(/\d/g) || []).join('');
+    if (digits.length >= 3) return digits.slice(-3);
+
+    return digits;
+  }
+
+  function scoreCandidate(value, raw, conf){
+    let s = 0;
+    if (/^\d{3}$/.test(value)) s += 100;
+    if (value.length === 3) s += 20;
+    if (/^\d+$/.test(value)) s += 10;
+    if (/-\d{3}$/.test(raw || '')) s += 18;
+    s += conf * 20;
+    return s;
   }
 
   function pushRecent(value, conf){
-    recent.push({ value, conf, time: Date.now() });
-    while(recent.length > MAX_RECENT) recent.shift();
+    recent.push({ value, conf, at: Date.now() });
+    while(recent.length > RECENT_MAX) recent.shift();
   }
 
   function decideStable(){
-    const recent2 = recent.filter(r => /^\d{3}$/.test(r.value));
-    if (recent2.length < 3) return null;
+    const valid = recent.filter(r => /^\d{3}$/.test(r.value));
+    if (valid.length < 3) return null;
 
     const map = new Map();
-    for (const r of recent2){
-      if (!map.has(r.value)) map.set(r.value, { count:0, confSum:0 });
-      const m = map.get(r.value);
-      m.count++;
-      m.confSum += r.conf;
+    for (const r of valid){
+      if (!map.has(r.value)){
+        map.set(r.value, { count: 0, confSum: 0 });
+      }
+      const o = map.get(r.value);
+      o.count++;
+      o.confSum += r.conf;
     }
 
     let best = null;
     for (const [value, info] of map.entries()){
-      if (!best || info.count > best.count || (info.count === best.count && info.confSum > best.confSum)){
-        best = { value, count:info.count, confAvg: info.confSum / info.count };
+      const avg = info.confSum / info.count;
+      if (!best || info.count > best.count || (info.count === best.count && avg > best.avg)){
+        best = { value, count: info.count, avg };
       }
     }
 
-    if (best && (best.count >= 3 || best.confAvg >= 0.80)){
-      return best;
-    }
+    if (!best) return null;
+    if (best.count >= 3) return best;
+    if (best.count >= 2 && best.avg >= 0.88) return best;
     return null;
   }
 
@@ -516,33 +570,30 @@
 
     const w = roiCanvas.width;
     const h = roiCanvas.height;
+
     binCanvas.width = w;
     binCanvas.height = h;
 
-    // 前処理パターン1
     enhanceGrayAndThreshold(roiCtx, binCtx, w, h, {
-      contrast: 2.2,
-      brightness: 0,
+      contrast: 2.6,
+      brightness: -6,
       blur: true,
-      thresholdBias: -8
+      thresholdBias: -18
     });
-
     const c1 = trimToContent(binCanvas);
 
-    // 前処理パターン2
     const tmp2 = document.createElement('canvas');
     tmp2.width = w;
     tmp2.height = h;
     const tmp2ctx = tmp2.getContext('2d', { willReadFrequently: true });
     enhanceGrayAndThreshold(roiCtx, tmp2ctx, w, h, {
-      contrast: 1.7,
-      brightness: 4,
+      contrast: 2.0,
+      brightness: -2,
       blur: false,
-      thresholdBias: 10
+      thresholdBias: -6
     });
     const c2 = trimToContent(tmp2);
 
-    // 前処理パターン3: 元画像をそのまま少し拡大
     const c3 = document.createElement('canvas');
     c3.width = w * 2;
     c3.height = h * 2;
@@ -550,23 +601,24 @@
 
     const tries = [
       await recognizeCanvas(c1, 7),
-      await recognizeCanvas(c1, 8),
+      await recognizeCanvas(c1, 13),
       await recognizeCanvas(c2, 7),
-      await recognizeCanvas(c2, 8),
+      await recognizeCanvas(c2, 13),
       await recognizeCanvas(c3, 7)
     ].filter(Boolean);
 
     if (!tries.length) return;
 
     let best = null;
+
     for (const t of tries){
-      const digits = (t.digits || '').slice(0, 3);
-      const score = scoreCandidate(digits) + t.confidence * 20;
+      const value = extractLast3Digits(t.raw || '');
+      const score = scoreCandidate(value, t.raw, t.confidence);
       if (!best || score > best.score){
         best = {
-          value: digits,
-          confidence: t.confidence,
+          value,
           raw: t.raw,
+          confidence: t.confidence,
           score
         };
       }
@@ -574,17 +626,28 @@
 
     if (!best) return;
 
-    setResult(best.value || '---', `候補: ${best.value || best.raw || '---'} / 信頼度 ${best.confidence.toFixed(2)}`);
+    setResult(
+      best.value || '---',
+      `候補: ${best.value || best.raw || '---'} / 信頼度 ${best.confidence.toFixed(2)}`,
+      false
+    );
 
     if (/^\d{3}$/.test(best.value)){
       pushRecent(best.value, best.confidence);
+
       const stable = decideStable();
       if (stable){
+        setResult(
+          stable.value,
+          `候補: ${stable.value} / 信頼度 ${stable.avg.toFixed(2)}`,
+          true
+        );
+
         const now = Date.now();
-        if (stable.value !== lastAccepted || (now - lastAcceptedTime) > 2000){
-          lastAccepted = stable.value;
-          lastAcceptedTime = now;
-          addLog(`認識: ${stable.value}  信頼度=${stable.confAvg.toFixed(2)}  安定=${stable.count}票`);
+        if (stable.value !== lastCommitted || (now - lastCommittedAt) > 2000){
+          lastCommitted = stable.value;
+          lastCommittedAt = now;
+          addLog(`認識: ${stable.value}  信頼度=${stable.avg.toFixed(2)}  安定=${stable.count}票`);
         }
       }
     }
@@ -592,17 +655,19 @@
 
   async function loop(){
     if (!running) return;
-    if (!ocrBusy && video.readyState >= 2){
-      ocrBusy = true;
+
+    if (!busy && video.readyState >= 2){
+      busy = true;
       try{
         await processFrame();
       }catch(err){
         console.error(err);
       }finally{
-        ocrBusy = false;
+        busy = false;
       }
     }
-    setTimeout(loop, 650);
+
+    timerId = setTimeout(loop, 650);
   }
 
   startBtn.addEventListener('click', async () => {
@@ -613,9 +678,10 @@
   clearBtn.addEventListener('click', () => {
     logEl.textContent = '';
     recent.length = 0;
-    lastAccepted = '';
-    lastAcceptedTime = 0;
-    setResult('---', '候補: --- / 信頼度 ---');
+    lastCommitted = '';
+    lastCommittedAt = 0;
+    setResult('---', '候補: --- / 信頼度 ---', false);
+    addLog('ログ消去');
   });
 
   window.addEventListener('beforeunload', () => {
