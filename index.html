@@ -1,693 +1,109 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>Bluefy テプラ3桁 読み取り</title>
-<style>
-  :root{
-    --bg:#0b0d10;
-    --card:#121826;
-    --card2:#0c111b;
-    --text:#eef2f7;
-    --muted:#98a3b3;
-    --accent:#19aec8;
-    --accent2:#f2cb68;
-    --btn2:#465269;
-    --ok:#4ade80;
-    --ng:#fb7185;
-  }
-  *{box-sizing:border-box}
-  html,body{
-    margin:0;
-    padding:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    -webkit-user-select:none;
-    user-select:none;
-  }
-  body{
-    touch-action:manipulation;
-  }
-  .wrap{
-    max-width:920px;
-    margin:0 auto;
-    padding:12px 12px 32px;
-  }
-  .card{
-    background:linear-gradient(180deg,#101726 0%, #0b1019 100%);
-    border-radius:22px;
-    padding:16px;
-    margin-bottom:14px;
-    box-shadow:0 10px 26px rgba(0,0,0,.28);
-  }
-  .title{
-    font-size:20px;
-    font-weight:800;
-    margin:0 0 14px;
-  }
-  .resultBox{
-    background:#070c15;
-    border-radius:18px;
-    padding:24px 12px 16px;
-    text-align:center;
-  }
-  .big{
-    font-size:96px;
-    line-height:1;
-    font-weight:900;
-    letter-spacing:.08em;
-  }
-  .sub{
-    margin-top:10px;
-    font-size:16px;
-    color:var(--accent2);
-    font-weight:700;
-  }
-  .controls{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-top:14px;
-  }
-  button{
-    appearance:none;
-    border:none;
-    border-radius:18px;
-    padding:18px 14px;
-    color:#fff;
-    font-size:22px;
-    font-weight:900;
-    background:var(--accent);
-    touch-action:manipulation;
-  }
-  button.secondary{
-    background:var(--btn2);
-  }
-  button:active{
-    transform:scale(.99);
-  }
-
-  .videoWrap{
-    position:relative;
-    overflow:hidden;
-    border-radius:22px;
-    background:#000;
-    aspect-ratio:3/4;
-  }
-  video{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
-  .overlay{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-  }
-  .guide{
-    position:absolute;
-    left:30%;
-    top:58%;
-    width:56%;
-    height:13%;
-    border:4px solid rgba(255,220,120,.95);
-    border-radius:16px;
-    box-shadow:0 0 0 9999px rgba(0,0,0,.20);
-  }
-  .guideText{
-    position:absolute;
-    left:0;
-    right:0;
-    top:calc(58% - 34px);
-    text-align:center;
-    font-size:15px;
-    color:#f6d27a;
-    font-weight:900;
-    text-shadow:0 1px 3px rgba(0,0,0,.9);
-  }
-  .grid2{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-  }
-  .cap{
-    font-size:13px;
-    color:var(--muted);
-    margin:0 0 6px;
-    font-weight:700;
-  }
-  canvas{
-    width:100%;
-    background:#000;
-    border-radius:14px;
-    display:block;
-  }
-  .log{
-    background:#060b12;
-    border-radius:16px;
-    padding:12px;
-    height:260px;
-    overflow:auto;
-    white-space:pre-wrap;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:14px;
-    line-height:1.45;
-  }
-  .hint{
-    font-size:14px;
-    color:var(--muted);
-    line-height:1.7;
-  }
-  .status{
-    margin-top:8px;
-    font-size:14px;
-    font-weight:800;
-  }
-  .ok{ color:var(--ok); }
-  .ng{ color:var(--ng); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bluefy OCR Scanner</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin: 0; padding: 20px; background: #f4f4f9; }
+        #video-container { position: relative; width: 100%; max-width: 500px; margin: auto; }
+        video { width: 100%; border-radius: 8px; background: #000; }
+        #overlay {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%; height: 30%;
+            border: 2px solid #00ff00; box-sizing: border-box;
+            pointer-events: none;
+        }
+        button {
+            margin-top: 20px; padding: 12px 24px;
+            font-size: 16px; border: none; border-radius: 50px;
+            background: #007aff; color: white; cursor: pointer;
+        }
+        button:disabled { background: #ccc; }
+        #result-area {
+            margin-top: 20px; padding: 15px; background: white;
+            border-radius: 8px; min-height: 50px; border: 1px solid #ddd;
+            word-wrap: break-word; text-align: left;
+        }
+        .loading { color: #888; font-style: italic; }
+    </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="card">
-    <div class="title">認識結果</div>
-    <div class="resultBox">
-      <div id="result" class="big">---</div>
-      <div id="sub" class="sub">候補: --- / 信頼度 ---</div>
-      <div id="status" class="status ng">未確定</div>
+    <h2>文字読み取り (OCR)</h2>
+
+    <div id="video-container">
+        <video id="video" autoplay playsinline></video>
+        <div id="overlay"></div>
     </div>
-    <div class="controls">
-      <button id="startBtn">カメラ開始</button>
-      <button id="clearBtn" class="secondary">ログ消去</button>
+
+    <button id="capture-btn">文字を読み取る</button>
+
+    <div id="result-area">
+        <p id="status">カメラを許可してください</p>
+        <div id="text-output"></div>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="title">カメラ</div>
-    <div class="videoWrap">
-      <video id="video" playsinline muted autoplay></video>
-      <div class="overlay">
-        <div class="guideText">3桁数字を枠内に合わせてください</div>
-        <div class="guide"></div>
-      </div>
-    </div>
-  </div>
+    <canvas id="canvas" style="display:none;"></canvas>
 
-  <div class="card">
-    <div class="title">前処理プレビュー</div>
-    <div class="grid2">
-      <div>
-        <div class="cap">切り出し（右寄せ）</div>
-        <canvas id="roiCanvas" width="900" height="240"></canvas>
-      </div>
-      <div>
-        <div class="cap">二値化</div>
-        <canvas id="binCanvas" width="900" height="240"></canvas>
-      </div>
-    </div>
-  </div>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('capture-btn');
+        const status = document.getElementById('status');
+        const output = document.getElementById('text-output');
 
-  <div class="card">
-    <div class="title">ログ</div>
-    <div id="log" class="log"></div>
-  </div>
-
-  <div class="card">
-    <div class="title">使い方</div>
-    <div class="hint">
-      読み取りたいテプラの3桁が、黄色枠の右寄りに来るように合わせてください。<br>
-      この版は <b>ハイフン右側の3桁</b> を強く意識した処理です。<br>
-      例: <b>F-803 → 803</b><br>
-      余計なラベルや別文字を枠に入れないほど安定します。<br>
-      Bluefy / Safari 系では HTTPS 配信が必要です。
-    </div>
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script>
-(() => {
-  const video = document.getElementById('video');
-  const startBtn = document.getElementById('startBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const resultEl = document.getElementById('result');
-  const subEl = document.getElementById('sub');
-  const statusEl = document.getElementById('status');
-  const logEl = document.getElementById('log');
-
-  const roiCanvas = document.getElementById('roiCanvas');
-  const roiCtx = roiCanvas.getContext('2d', { willReadFrequently: true });
-  const binCanvas = document.getElementById('binCanvas');
-  const binCtx = binCanvas.getContext('2d', { willReadFrequently: true });
-
-  let stream = null;
-  let worker = null;
-  let running = false;
-  let busy = false;
-  let timerId = null;
-
-  const recent = [];
-  const RECENT_MAX = 12;
-  let lastCommitted = '';
-  let lastCommittedAt = 0;
-
-  function clamp(v, min, max){
-    return Math.max(min, Math.min(max, v));
-  }
-
-  function nowStamp(){
-    const t = new Date();
-    const hh = String(t.getHours()).padStart(2, '0');
-    const mm = String(t.getMinutes()).padStart(2, '0');
-    const ss = String(t.getSeconds()).padStart(2, '0');
-    const ms = String(t.getMilliseconds()).padStart(3, '0');
-    return `[${hh}:${mm}:${ss}.${ms}]`;
-  }
-
-  function addLog(msg){
-    logEl.textContent += `${nowStamp()} ${msg}\n`;
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-
-  function setResult(main, sub, stable=false){
-    resultEl.textContent = main || '---';
-    subEl.textContent = sub || '候補: --- / 信頼度 ---';
-    statusEl.textContent = stable ? '確定' : '未確定';
-    statusEl.className = 'status ' + (stable ? 'ok' : 'ng');
-  }
-
-  async function initOCR(){
-    if (worker) return;
-    addLog('OCR初期化中...');
-    worker = await Tesseract.createWorker('eng', 1, {
-      logger: () => {}
-    });
-    await worker.setParameters({
-      tessedit_char_whitelist: '0123456789-',
-      preserve_interword_spaces: '0',
-      user_defined_dpi: '300'
-    });
-    addLog('OCR初期化完了');
-  }
-
-  async function startCamera(){
-    if (running) return;
-
-    try{
-      await initOCR();
-
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
-        },
-        audio: false
-      });
-
-      video.srcObject = stream;
-      await video.play();
-
-      running = true;
-      startBtn.textContent = 'カメラ停止';
-      addLog('カメラ開始');
-      loop();
-    }catch(err){
-      console.error(err);
-      addLog('開始失敗: ' + err.message);
-      alert('カメラを開始できませんでした。HTTPSとカメラ権限を確認してください。');
-    }
-  }
-
-  function stopCamera(){
-    running = false;
-    if (timerId){
-      clearTimeout(timerId);
-      timerId = null;
-    }
-    if (stream){
-      stream.getTracks().forEach(t => t.stop());
-      stream = null;
-    }
-    video.srcObject = null;
-    startBtn.textContent = 'カメラ開始';
-    addLog('カメラ停止');
-  }
-
-  function cropROIToCanvas(){
-    if (!video.videoWidth || !video.videoHeight) return null;
-
-    const vw = video.videoWidth;
-    const vh = video.videoHeight;
-
-    const guideX = 0.30;
-    const guideY = 0.58;
-    const guideW = 0.56;
-    const guideH = 0.13;
-
-    const gx = Math.floor(vw * guideX);
-    const gy = Math.floor(vh * guideY);
-    const gw = Math.floor(vw * guideW);
-    const gh = Math.floor(vh * guideH);
-
-    const sx = Math.floor(gx + gw * 0.34);
-    const sy = Math.floor(gy + gh * 0.08);
-    const sw = Math.floor(gw * 0.58);
-    const sh = Math.floor(gh * 0.84);
-
-    roiCanvas.width = 900;
-    roiCanvas.height = 240;
-    roiCtx.drawImage(video, sx, sy, sw, sh, 0, 0, roiCanvas.width, roiCanvas.height);
-
-    return { sx, sy, sw, sh };
-  }
-
-  function enhanceGrayAndThreshold(srcCtx, dstCtx, w, h, opt = {}){
-    const {
-      contrast = 2.0,
-      brightness = 0,
-      blur = false,
-      thresholdBias = 0
-    } = opt;
-
-    const img = srcCtx.getImageData(0, 0, w, h);
-    const data = img.data;
-
-    const gray = new Uint8ClampedArray(w * h);
-
-    for(let i = 0, p = 0; i < data.length; i += 4, p++){
-      let g = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-      g = (g - 128) * contrast + 128 + brightness;
-      gray[p] = clamp(g, 0, 255);
-    }
-
-    let work = gray;
-
-    if (blur){
-      const out = new Uint8ClampedArray(w * h);
-      for(let y = 1; y < h - 1; y++){
-        for(let x = 1; x < w - 1; x++){
-          let sum = 0;
-          for(let dy = -1; dy <= 1; dy++){
-            for(let dx = -1; dx <= 1; dx++){
-              sum += gray[(y + dy) * w + (x + dx)];
+        // 1. カメラの開始
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }, // 背面カメラ
+                    audio: false
+                });
+                video.srcObject = stream;
+                status.innerText = "カメラ準備完了";
+            } catch (err) {
+                status.innerText = "カメラの起動に失敗しました: " + err.message;
             }
-          }
-          out[y * w + x] = sum / 9;
         }
-      }
-      work = out;
-    }
 
-    const hist = new Uint32Array(256);
-    for(let i = 0; i < work.length; i++) hist[work[i]]++;
+        // 2. OCR実行処理
+        async function performOCR() {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // ビデオの現在のフレームをCanvasに描画
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    const total = work.length;
-    let sum = 0;
-    for(let i = 0; i < 256; i++) sum += i * hist[i];
+            status.innerText = "解析中... (数秒かかります)";
+            captureBtn.disabled = true;
+            output.innerText = "";
 
-    let sumB = 0;
-    let wB = 0;
-    let maxVar = 0;
-    let th = 127;
+            try {
+                // Tesseract.jsで解析（日本語 + 英語）
+                const result = await Tesseract.recognize(
+                    canvas.toDataURL('image/jpeg'),
+                    'jpn+eng', 
+                    { logger: m => console.log(m) }
+                );
 
-    for(let t = 0; t < 256; t++){
-      wB += hist[t];
-      if (!wB) continue;
-      const wF = total - wB;
-      if (!wF) break;
-
-      sumB += t * hist[t];
-      const mB = sumB / wB;
-      const mF = (sum - sumB) / wF;
-      const variance = wB * wF * (mB - mF) * (mB - mF);
-
-      if (variance > maxVar){
-        maxVar = variance;
-        th = t;
-      }
-    }
-
-    th = clamp(th + thresholdBias, 0, 255);
-
-    const outImg = dstCtx.createImageData(w, h);
-    for(let i = 0, p = 0; p < work.length; i += 4, p++){
-      const v = work[p] < th ? 0 : 255;
-      outImg.data[i] = v;
-      outImg.data[i + 1] = v;
-      outImg.data[i + 2] = v;
-      outImg.data[i + 3] = 255;
-    }
-    dstCtx.putImageData(outImg, 0, 0);
-  }
-
-  function trimToContent(srcCanvas){
-    const ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
-    const w = srcCanvas.width;
-    const h = srcCanvas.height;
-    const img = ctx.getImageData(0, 0, w, h);
-    const d = img.data;
-
-    let minX = w, minY = h, maxX = -1, maxY = -1;
-
-    for(let y = 0; y < h; y++){
-      for(let x = 0; x < w; x++){
-        const i = (y * w + x) * 4;
-        const v = d[i];
-        if (v < 128){
-          if (x < minX) minX = x;
-          if (y < minY) minY = y;
-          if (x > maxX) maxX = x;
-          if (y > maxY) maxY = y;
+                status.innerText = "解析完了";
+                output.innerText = result.data.text;
+            } catch (error) {
+                status.innerText = "エラーが発生しました";
+                console.error(error);
+            } finally {
+                captureBtn.disabled = false;
+            }
         }
-      }
-    }
 
-    if (maxX < 0 || maxY < 0){
-      return srcCanvas;
-    }
+        captureBtn.addEventListener('click', performOCR);
 
-    const padX = Math.floor((maxX - minX + 1) * 0.12) + 8;
-    const padY = Math.floor((maxY - minY + 1) * 0.18) + 8;
-
-    minX = clamp(minX - padX, 0, w - 1);
-    minY = clamp(minY - padY, 0, h - 1);
-    maxX = clamp(maxX + padX, 0, w - 1);
-    maxY = clamp(maxY + padY, 0, h - 1);
-
-    const tw = maxX - minX + 1;
-    const th = maxY - minY + 1;
-
-    const out = document.createElement('canvas');
-    out.width = Math.max(1, tw * 2);
-    out.height = Math.max(1, th * 2);
-    out.getContext('2d').drawImage(srcCanvas, minX, minY, tw, th, 0, 0, out.width, out.height);
-    return out;
-  }
-
-  async function recognizeCanvas(canvas, psm = 7){
-    if (!worker) return null;
-    try{
-      await worker.setParameters({
-        tessedit_pageseg_mode: String(psm),
-        tessedit_char_whitelist: '0123456789-'
-      });
-      const { data } = await worker.recognize(canvas);
-      return {
-        raw: (data.text || '').replace(/\s/g, ''),
-        confidence: typeof data.confidence === 'number' ? data.confidence / 100 : 0
-      };
-    }catch(e){
-      return null;
-    }
-  }
-
-  function extractLast3Digits(text){
-    const cleaned = (text || '').replace(/\s/g, '');
-
-    let m = cleaned.match(/(\d{3})\D*$/);
-    if (m) return m[1];
-
-    m = cleaned.match(/(\d{3})/);
-    if (m) return m[1];
-
-    const digits = (cleaned.match(/\d/g) || []).join('');
-    if (digits.length >= 3) return digits.slice(-3);
-
-    return digits;
-  }
-
-  function scoreCandidate(value, raw, conf){
-    let s = 0;
-    if (/^\d{3}$/.test(value)) s += 100;
-    if (value.length === 3) s += 20;
-    if (/^\d+$/.test(value)) s += 10;
-    if (/-\d{3}$/.test(raw || '')) s += 18;
-    s += conf * 20;
-    return s;
-  }
-
-  function pushRecent(value, conf){
-    recent.push({ value, conf, at: Date.now() });
-    while(recent.length > RECENT_MAX) recent.shift();
-  }
-
-  function decideStable(){
-    const valid = recent.filter(r => /^\d{3}$/.test(r.value));
-    if (valid.length < 3) return null;
-
-    const map = new Map();
-    for (const r of valid){
-      if (!map.has(r.value)){
-        map.set(r.value, { count: 0, confSum: 0 });
-      }
-      const o = map.get(r.value);
-      o.count++;
-      o.confSum += r.conf;
-    }
-
-    let best = null;
-    for (const [value, info] of map.entries()){
-      const avg = info.confSum / info.count;
-      if (!best || info.count > best.count || (info.count === best.count && avg > best.avg)){
-        best = { value, count: info.count, avg };
-      }
-    }
-
-    if (!best) return null;
-    if (best.count >= 3) return best;
-    if (best.count >= 2 && best.avg >= 0.88) return best;
-    return null;
-  }
-
-  async function processFrame(){
-    cropROIToCanvas();
-
-    const w = roiCanvas.width;
-    const h = roiCanvas.height;
-
-    binCanvas.width = w;
-    binCanvas.height = h;
-
-    enhanceGrayAndThreshold(roiCtx, binCtx, w, h, {
-      contrast: 2.6,
-      brightness: -6,
-      blur: true,
-      thresholdBias: -18
-    });
-    const c1 = trimToContent(binCanvas);
-
-    const tmp2 = document.createElement('canvas');
-    tmp2.width = w;
-    tmp2.height = h;
-    const tmp2ctx = tmp2.getContext('2d', { willReadFrequently: true });
-    enhanceGrayAndThreshold(roiCtx, tmp2ctx, w, h, {
-      contrast: 2.0,
-      brightness: -2,
-      blur: false,
-      thresholdBias: -6
-    });
-    const c2 = trimToContent(tmp2);
-
-    const c3 = document.createElement('canvas');
-    c3.width = w * 2;
-    c3.height = h * 2;
-    c3.getContext('2d').drawImage(roiCanvas, 0, 0, c3.width, c3.height);
-
-    const tries = [
-      await recognizeCanvas(c1, 7),
-      await recognizeCanvas(c1, 13),
-      await recognizeCanvas(c2, 7),
-      await recognizeCanvas(c2, 13),
-      await recognizeCanvas(c3, 7)
-    ].filter(Boolean);
-
-    if (!tries.length) return;
-
-    let best = null;
-
-    for (const t of tries){
-      const value = extractLast3Digits(t.raw || '');
-      const score = scoreCandidate(value, t.raw, t.confidence);
-      if (!best || score > best.score){
-        best = {
-          value,
-          raw: t.raw,
-          confidence: t.confidence,
-          score
-        };
-      }
-    }
-
-    if (!best) return;
-
-    setResult(
-      best.value || '---',
-      `候補: ${best.value || best.raw || '---'} / 信頼度 ${best.confidence.toFixed(2)}`,
-      false
-    );
-
-    if (/^\d{3}$/.test(best.value)){
-      pushRecent(best.value, best.confidence);
-
-      const stable = decideStable();
-      if (stable){
-        setResult(
-          stable.value,
-          `候補: ${stable.value} / 信頼度 ${stable.avg.toFixed(2)}`,
-          true
-        );
-
-        const now = Date.now();
-        if (stable.value !== lastCommitted || (now - lastCommittedAt) > 2000){
-          lastCommitted = stable.value;
-          lastCommittedAt = now;
-          addLog(`認識: ${stable.value}  信頼度=${stable.avg.toFixed(2)}  安定=${stable.count}票`);
-        }
-      }
-    }
-  }
-
-  async function loop(){
-    if (!running) return;
-
-    if (!busy && video.readyState >= 2){
-      busy = true;
-      try{
-        await processFrame();
-      }catch(err){
-        console.error(err);
-      }finally{
-        busy = false;
-      }
-    }
-
-    timerId = setTimeout(loop, 650);
-  }
-
-  startBtn.addEventListener('click', async () => {
-    if (running) stopCamera();
-    else await startCamera();
-  });
-
-  clearBtn.addEventListener('click', () => {
-    logEl.textContent = '';
-    recent.length = 0;
-    lastCommitted = '';
-    lastCommittedAt = 0;
-    setResult('---', '候補: --- / 信頼度 ---', false);
-    addLog('ログ消去');
-  });
-
-  window.addEventListener('beforeunload', () => {
-    stopCamera();
-  });
-})();
-</script>
+        // ページ読み込み時にカメラ起動
+        window.addEventListener('load', startCamera);
+    </script>
 </body>
 </html>
