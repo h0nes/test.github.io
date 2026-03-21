@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bluefy OCR Scanner</title>
+    <title>Bluefy Continuous OCR Scanner</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         body { font-family: sans-serif; text-align: center; margin: 0; padding: 20px; background: #f4f4f9; }
@@ -21,28 +21,29 @@
             font-size: 16px; border: none; border-radius: 50px;
             background: #007aff; color: white; cursor: pointer;
         }
-        button:disabled { background: #ccc; }
+        button.stop { background: #ff3b30; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
         #result-area {
             margin-top: 20px; padding: 15px; background: white;
             border-radius: 8px; min-height: 50px; border: 1px solid #ddd;
             word-wrap: break-word; text-align: left;
+            font-size: 18px; font-weight: bold;
         }
-        .loading { color: #888; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <h2>文字読み取り (OCR)</h2>
+    <h2>連続文字読み取り (OCR)</h2>
 
     <div id="video-container">
         <video id="video" autoplay playsinline></video>
         <div id="overlay"></div>
     </div>
 
-    <button id="capture-btn">文字を読み取る</button>
+    <button id="toggle-btn" disabled>準備中...</button>
 
     <div id="result-area">
-        <p id="status">カメラを許可してください</p>
+        <p id="status" style="font-size: 14px; font-weight: normal; color: #666;">カメラとOCRエンジンを準備しています...</p>
         <div id="text-output"></div>
     </div>
 
@@ -51,26 +52,44 @@
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const captureBtn = document.getElementById('capture-btn');
+        const toggleBtn = document.getElementById('toggle-btn');
         const status = document.getElementById('status');
         const output = document.getElementById('text-output');
+
+        let worker = null;
+        let isScanning = false;
 
         // 1. カメラの開始
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }, // 背面カメラ
+                    video: { facingMode: 'environment' },
                     audio: false
                 });
                 video.srcObject = stream;
-                status.innerText = "カメラ準備完了";
             } catch (err) {
                 status.innerText = "カメラの起動に失敗しました: " + err.message;
             }
         }
 
-        // 2. OCR実行処理
-        async function performOCR() {
+        // 2. OCRエンジンの初期化（使い回し用）
+        async function initOCR() {
+            try {
+                worker = await Tesseract.createWorker('jpn+eng');
+                status.innerText = "準備完了！開始ボタンを押してください。";
+                toggleBtn.innerText = "読み取り開始";
+                toggleBtn.disabled = false;
+            } catch (err) {
+                status.innerText = "OCRの準備に失敗しました。";
+                console.error(err);
+            }
+        }
+
+        // 3. 連続OCR処理のループ
+        async function scanLoop() {
+            // 停止フラグが立っていたらループを抜ける
+            if (!isScanning) return;
+
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -78,32 +97,46 @@
             // ビデオの現在のフレームをCanvasに描画
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            status.innerText = "解析中... (数秒かかります)";
-            captureBtn.disabled = true;
-            output.innerText = "";
+            status.innerText = "解析中...";
 
             try {
-                // Tesseract.jsで解析（日本語 + 英語）
-                const result = await Tesseract.recognize(
-                    canvas.toDataURL('image/jpeg'),
-                    'jpn+eng', 
-                    { logger: m => console.log(m) }
-                );
-
-                status.innerText = "解析完了";
-                output.innerText = result.data.text;
+                // 初期化したワーカーを使って解析
+                const result = await worker.recognize(canvas);
+                const text = result.data.text.trim();
+                
+                if (text) {
+                    output.innerText = text;
+                }
+                status.innerText = "待機中 (0.5秒)...";
             } catch (error) {
-                status.innerText = "エラーが発生しました";
                 console.error(error);
-            } finally {
-                captureBtn.disabled = false;
+                status.innerText = "エラーが発生しました";
             }
+
+            // 処理が完了してから0.5秒(500ms)後に次のループを呼び出す
+            setTimeout(scanLoop, 500);
         }
 
-        captureBtn.addEventListener('click', performOCR);
+        // 4. ボタンのクリックイベント（開始/停止の切り替え）
+        toggleBtn.addEventListener('click', () => {
+            isScanning = !isScanning;
+            
+            if (isScanning) {
+                toggleBtn.innerText = "読み取り停止";
+                toggleBtn.classList.add("stop");
+                scanLoop(); // ループ開始
+            } else {
+                toggleBtn.innerText = "読み取り開始";
+                toggleBtn.classList.remove("stop");
+                status.innerText = "一時停止中";
+            }
+        });
 
-        // ページ読み込み時にカメラ起動
-        window.addEventListener('load', startCamera);
+        // ページ読み込み時の処理
+        window.addEventListener('load', async () => {
+            await startCamera();
+            await initOCR();
+        });
     </script>
 </body>
 </html>
